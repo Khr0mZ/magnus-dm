@@ -6,6 +6,46 @@ import { fileURLToPath } from 'node:url';
 await build({ configFile: false, publicDir: false, logLevel: 'silent', build: { outDir: 'work/tests', emptyOutDir: true, minify: false, lib: { entry: fileURLToPath(new URL('./entry.ts', import.meta.url)), formats: ['es'], fileName: () => 'engine.mjs' } } });
 const engine = await import('../work/tests/engine.mjs');
 
+test('a cached wallpaper finishes loading even when its load event happened before hydration', async () => {
+  const image = new EventTarget();
+  Object.assign(image, { complete: true, naturalWidth: 1920, decode: async () => {} });
+  const states = [];
+  const stop = engine.observeImageLoading(image, state => states.push(state));
+  await Promise.resolve();
+  assert.deepEqual(states, ['ready']);
+  stop();
+});
+
+test('wallpaper readiness waits for decoding and ignores completion from a previous theme or screen size', async () => {
+  const image = new EventTarget();
+  let resolveDecode;
+  Object.assign(image, { complete: false, naturalWidth: 1920, decode: () => new Promise(resolve => { resolveDecode = resolve; }) });
+  const states = [];
+  const stop = engine.observeImageLoading(image, state => states.push(state));
+  image.dispatchEvent(new Event('load'));
+  assert.deepEqual(states, []);
+  resolveDecode(); await Promise.resolve();
+  assert.deepEqual(states, ['ready']);
+  image.dispatchEvent(new Event('load'));
+  stop();
+  resolveDecode(); await Promise.resolve();
+  image.dispatchEvent(new Event('error'));
+  assert.deepEqual(states, ['ready'], 'an unmounted image cannot update the current loader');
+});
+
+test('cached failures and load or decode errors stop the wallpaper loader', async () => {
+  for (const kind of ['cached', 'load', 'decode']) {
+    const image = new EventTarget();
+    Object.assign(image, { complete: kind === 'cached', naturalWidth: kind === 'cached' ? 0 : 1920, decode: async () => { throw new Error('decode failed'); } });
+    const states = [];
+    const stop = engine.observeImageLoading(image, state => states.push(state));
+    if (kind !== 'cached') image.dispatchEvent(new Event(kind === 'load' ? 'error' : 'load'));
+    await Promise.resolve();
+    assert.deepEqual(states, ['error'], kind);
+    stop();
+  }
+});
+
 test('mouse dragging scrolls files without activating them, preserving clicks, touch and keyboard', () => {
   class Rail extends EventTarget {
     dataset = {};

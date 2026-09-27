@@ -1,6 +1,7 @@
 'use client';
 /* The native picture loads the same branded artwork with observable events. */
-import { memo, useState, useSyncExternalStore } from 'react';
+import { memo, useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { observeImageLoading, type ImageLoadStatus } from '../lib/image-loading';
 import { useLocale } from './locale';
 import ImageLoader from './image-loader';
 
@@ -15,16 +16,17 @@ const getServerMobile = () => false;
 
 function BackgroundArtwork({ reader }: { reader: boolean }) {
   const { t } = useLocale();
-  const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
+  const [status, setStatus] = useState<ImageLoadStatus>('loading');
+  const imageRef = useRef<HTMLImageElement>(null);
   const desktop = reader ? '/magnus-city-reader-v2.webp' : '/magnus-city.webp';
   const mobile = reader ? '/magnus-city-reader-mobile-v2.webp' : '/magnus-city-mobile.webp';
-  async function finishLoading(image: HTMLImageElement) {
-    try { await image.decode(); setStatus('ready'); }
-    catch { setStatus('error'); }
-  }
+  useEffect(() => {
+    const image = imageRef.current;
+    if (image) return observeImageLoading(image, setStatus);
+  }, []);
   return <>
     <div className="cyber-background" aria-hidden="true">
-      <picture><source media={mobileQuery} srcSet={mobile} /><img src={desktop} alt="" decoding="async" fetchPriority="high" onLoad={event => { void finishLoading(event.currentTarget); }} onError={() => setStatus('error')} /></picture>
+      <picture><source media={mobileQuery} srcSet={mobile} /><img ref={imageRef} src={desktop} alt="" decoding="async" fetchPriority="high" /></picture>
     </div>
     {status !== 'ready' && <div className={`wallpaper-loading ${status === 'error' ? 'image-load-error' : ''}`}><ImageLoader label={t(status === 'error' ? 'No se ha podido cargar el fondo.' : 'Cargando fondo…')} /></div>}
   </>;

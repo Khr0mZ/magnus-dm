@@ -8,3 +8,4 @@ export { gmTableCategories, formatReference } from '../lib/reference';
 export { copyText } from '../lib/clipboard';
 export { referenceLabel, withLanguage, translate } from '../lib/i18n';
 export { generateRandomEncounter } from '../lib/soloPlayTablesExpanded';
+export { observeImageLoading } from '../lib/image-loading';

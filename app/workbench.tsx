@@ -113,8 +113,11 @@ function SessionWorkbench({ store }: { store: ReturnType<typeof useSession> }) {
     <CyberBackground reader={session.reader} />
     <a className="skip-link" href="#workspace">{t("Saltar a las herramientas")}</a>
     <header className="site-header">
-      <div className="brand"><img src="/magnus-laser.png" alt="Magnus Laser" width="64" height="64" /></div>
-      <div className="header-channel"><span className="signal-bars" aria-hidden="true"><i/><i/><i/><i/></span><span>{t("CANAL DEL DM")}<small>NIGHT CITY / 2080</small></span></div>
+      <div className="header-branding">
+        <div className="brand"><img src="/magnus-laser.png" alt="Magnus Laser" width="64" height="64" /></div>
+        <div className="header-channel"><span className="signal-bars" aria-hidden="true"><i/><i/><i/><i/></span><span>{t("CANAL DEL DM")}<small>NIGHT CITY / 2080</small></span></div>
+      </div>
+      <SessionBar {...store} />
       <div className="header-right">
         <div className="language-switch" role="group" aria-label={t("Idioma")}>
           <button lang="es" aria-label="Español" aria-pressed={language === 'es'} onClick={() => setLanguage('es')}><strong>ES</strong><small>Español</small></button>
@@ -129,7 +132,6 @@ function SessionWorkbench({ store }: { store: ReturnType<typeof useSession> }) {
 
     <main className="page-shell">
       <h1 className="sr-only">Magnus Laser · {t('Mesa del DM')}</h1>
-      <SessionBar {...store} />
       {error && <div role="alert" className="error-banner">{t(error)}{store.dirty && <button className="text-button" onClick={store.retrySave}>{t('Reintentar guardado')}</button>}</div>}
 
       <div id="workspace" className="workspace">
