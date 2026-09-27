@@ -1,0 +1,51 @@
+/* Shared document scrollbars: the viewport and nested regions use one palette. */
+:root {
+  --scroll-thumb: #00d8d8;
+  --scroll-end: #ff6533;
+  --scroll-hover: #62ffff;
+  --scroll-track: #07121b;
+  color-scheme: dark;
+  scrollbar-gutter: stable;
+}
+:root:has(.reader-mode) {
+  --scroll-thumb: #3f7d7f;
+  --scroll-end: #a14317;
+  --scroll-hover: #155b67;
+  --scroll-track: #edf1eb;
+  color-scheme: light;
+}
+html, body, .application, .application * { scrollbar-width: thin; scrollbar-color: var(--scroll-thumb) var(--scroll-track); }
+html::-webkit-scrollbar, body::-webkit-scrollbar, .application ::-webkit-scrollbar { width: 8px; height: 8px; }
+html::-webkit-scrollbar-track, body::-webkit-scrollbar-track, .application ::-webkit-scrollbar-track { background: var(--scroll-track); }
+html::-webkit-scrollbar-thumb, body::-webkit-scrollbar-thumb, .application ::-webkit-scrollbar-thumb { background: linear-gradient(var(--scroll-thumb), var(--scroll-end)); border: 1px solid var(--scroll-track); border-radius: 2px; }
+html::-webkit-scrollbar-thumb:hover, body::-webkit-scrollbar-thumb:hover, .application ::-webkit-scrollbar-thumb:hover { background: var(--scroll-hover); }
+html::-webkit-scrollbar-corner, body::-webkit-scrollbar-corner, .application ::-webkit-scrollbar-corner { background: var(--scroll-track); }
+
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+.page-shell { padding-top: 24px; }
+.session-bar { gap: 12px 20px; padding: 14px 18px; align-items: center; }
+.session-bar:before { background: var(--orange); box-shadow: 0 0 10px color-mix(in srgb, var(--orange) 50%, transparent); }
+.session-picker { display: flex; flex: 1 1 400px; align-items: center; gap: 12px; min-width: 0; }
+.session-picker label { font: 14px var(--mono); color: var(--orange); letter-spacing: .1em; }
+.session-picker select { min-width: 0; flex: 1; width: 100%; max-width: 470px; min-height: 42px; padding: 8px 28px 8px 10px; border-color: var(--border); background: var(--input); }
+.session-count { font: 14px var(--mono); color: var(--muted); }
+.session-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.session-action { display: inline-flex; align-items: center; gap: 8px; min-height: 42px; padding: 8px 12px; color: var(--cyan); border: 1px solid var(--border); background: var(--input); }
+.session-action:hover, .session-action[aria-expanded=true] { color: var(--orange); border-color: var(--orange); box-shadow: inset 0 -2px var(--orange), 0 0 12px color-mix(in srgb, var(--orange) 18%, transparent); }
+.session-action:hover > svg { animation: original-button-glitch .4s steps(2) 1; }
+.session-bar .session-delete { color: var(--orange); width: 42px; height: 42px; border: 1px solid var(--border); }
+.session-editor { flex: 1 0 100%; display: flex; flex-wrap: wrap; align-items: end; gap: 12px; padding-top: 14px; border-top: 1px dashed var(--border); min-width: 0; }
+.session-editor label { flex: 1 1 250px; min-width: 0; color: var(--soft); }
+.session-editor input { display: block; margin-top: 5px; width: 100%; }
+.session-editor > button { display: inline-flex; align-items: center; gap: 8px; min-height: 42px; }
+.session-delete-confirm { align-items: center; }
+.session-delete-confirm p { flex: 1 0 100%; font-size: 18px; color: var(--soft); }
+.error-banner > button { margin-left: 12px; }
+@media (max-width: 600px) {
+  .page-shell { padding-top: 16px; }
+  .session-bar { padding: 12px; gap: 10px; }
+  .session-picker { flex-basis: 100%; gap: 8px; }
+  .session-actions { width: 100%; }
+  .session-action { flex: 1; justify-content: center; padding-inline: 8px; }
+  .session-editor label { flex-basis: 100%; }
+}

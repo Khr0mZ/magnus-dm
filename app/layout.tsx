@@ -1,6 +1,15 @@
 import type { Metadata } from "next";
 import { headers } from 'next/headers';
 import "./globals.css";
+import './fonts.css';
+import './cyberpunk.css';
+import './terminal.css';
+import './reader.css';
+import './netrunner.css';
+import './stacks.css';
+import './workspace.css';
+import './controls.css';
+import './edgerunners.css';
 
 
 const siteMetadata: Metadata = {

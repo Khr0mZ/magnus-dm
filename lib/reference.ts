@@ -1,4 +1,16 @@
 import colors from './colors'
+import { referenceLabel, type Language } from './i18n'
+import { missionKitCategories } from './mission-kit'
+
+export function formatReference(table: GMTableDef, language: Language): string {
+    return [
+        referenceLabel(table.titleKey, language),
+        ...(table.descriptionKey ? [referenceLabel(table.descriptionKey, language)] : []),
+        table.columns.map(column => referenceLabel(column.headerKey, language)).join('\t'),
+        ...table.rows.map(row => row.cells.map(cell => typeof cell === 'string' && cell.startsWith('t:') ? referenceLabel(cell, language) : cell).join('\t')),
+        ...(table.sourceKey ? [referenceLabel(table.sourceKey, language)] : []),
+    ].join('\n')
+}
 
 export interface GMTableColumn {
     headerKey: string
@@ -15,6 +27,7 @@ export interface GMTableDef {
     key: string
     titleKey: string
     descriptionKey?: string
+    sourceKey?: string
     columns: GMTableColumn[]
     rows: GMTableRow[]
     color: string
@@ -28,17 +41,18 @@ export interface GMTableCategory {
 }
 
 export const gmTableCategories: GMTableCategory[] = [
+    ...missionKitCategories,
     // ─── CATEGORY 1: COMBAT GENERAL (RED) ───
     {
         key: 'combatGeneral',
         titleKey: 'categories.combatGeneral',
-        color: colors.neons.red.default,
+        color: colors.neons.orange.default,
         tables: [
             {
                 key: 'initiativeTurnOrder',
                 titleKey: 'tables.initiativeTurnOrder.title',
                 descriptionKey: 'tables.initiativeTurnOrder.description',
-                color: colors.neons.red.default,
+                color: colors.neons.orange.default,
                 columns: [
                     { headerKey: 'headers.phase', width: '30%' },
                     { headerKey: 'headers.details' },
@@ -52,7 +66,7 @@ export const gmTableCategories: GMTableCategory[] = [
             {
                 key: 'combatActions',
                 titleKey: 'tables.combatActions.title',
-                color: colors.neons.red.default,
+                color: colors.neons.orange.default,
                 columns: [
                     { headerKey: 'headers.action', width: '30%' },
                     { headerKey: 'headers.description' },
@@ -73,7 +87,7 @@ export const gmTableCategories: GMTableCategory[] = [
             {
                 key: 'combatModifiers',
                 titleKey: 'tables.combatModifiers.title',
-                color: colors.neons.red.default,
+                color: colors.neons.orange.default,
                 columns: [
                     { headerKey: 'headers.situation', width: '50%' },
                     { headerKey: 'headers.modifier', align: 'center' },
@@ -96,7 +110,7 @@ export const gmTableCategories: GMTableCategory[] = [
             {
                 key: 'coverConcealment',
                 titleKey: 'tables.coverConcealment.title',
-                color: colors.neons.red.default,
+                color: colors.neons.orange.default,
                 columns: [
                     { headerKey: 'headers.coverType', width: '50%' },
                     { headerKey: 'headers.sp', align: 'center' },
@@ -114,7 +128,7 @@ export const gmTableCategories: GMTableCategory[] = [
             {
                 key: 'woundStateEffects',
                 titleKey: 'tables.woundStateEffects.title',
-                color: colors.neons.red.default,
+                color: colors.neons.orange.default,
                 columns: [
                     { headerKey: 'headers.woundState', width: '30%' },
                     { headerKey: 'headers.condition', width: '35%' },
@@ -129,7 +143,7 @@ export const gmTableCategories: GMTableCategory[] = [
             {
                 key: 'deathSaves',
                 titleKey: 'tables.deathSaves.title',
-                color: colors.neons.red.default,
+                color: colors.neons.orange.default,
                 columns: [
                     { headerKey: 'headers.mechanic', width: '30%' },
                     { headerKey: 'headers.details' },
@@ -144,7 +158,7 @@ export const gmTableCategories: GMTableCategory[] = [
             {
                 key: 'armorAblation',
                 titleKey: 'tables.armorAblation.title',
-                color: colors.neons.red.default,
+                color: colors.neons.orange.default,
                 columns: [
                     { headerKey: 'headers.rule', width: '30%' },
                     { headerKey: 'headers.details' },
@@ -159,7 +173,7 @@ export const gmTableCategories: GMTableCategory[] = [
                 key: 'hpCalculation',
                 titleKey: 'tables.hpCalculation.title',
                 descriptionKey: 'tables.hpCalculation.description',
-                color: colors.neons.red.default,
+                color: colors.neons.orange.default,
                 columns: [
                     { headerKey: 'headers.body', align: 'center' },
                     { headerKey: 'headers.will', align: 'center' },
@@ -186,12 +200,12 @@ export const gmTableCategories: GMTableCategory[] = [
     {
         key: 'combatRanged',
         titleKey: 'categories.combatRanged',
-        color: colors.neons.red.default,
+        color: colors.neons.orange.default,
         tables: [
             {
                 key: 'singleShotDV',
                 titleKey: 'tables.singleShotDV.title',
-                color: colors.neons.red.default,
+                color: colors.neons.orange.default,
                 columns: [
                     { headerKey: 'headers.weaponType', width: '14%' },
                     { headerKey: 'headers.range0_6', align: 'center' },
@@ -220,7 +234,7 @@ export const gmTableCategories: GMTableCategory[] = [
             {
                 key: 'autofireDV',
                 titleKey: 'tables.autofireDV.title',
-                color: colors.neons.red.default,
+                color: colors.neons.orange.default,
                 columns: [
                     { headerKey: 'headers.weaponType', width: '14%' },
                     { headerKey: 'headers.range0_6', align: 'center' },
@@ -240,7 +254,7 @@ export const gmTableCategories: GMTableCategory[] = [
             {
                 key: 'aimedShot',
                 titleKey: 'tables.aimedShot.title',
-                color: colors.neons.red.default,
+                color: colors.neons.orange.default,
                 columns: [
                     { headerKey: 'headers.target', width: '25%' },
                     { headerKey: 'headers.modifier', align: 'center', width: '20%' },
@@ -254,7 +268,7 @@ export const gmTableCategories: GMTableCategory[] = [
             {
                 key: 'autofireMultiplier',
                 titleKey: 'tables.autofireMultiplier.title',
-                color: colors.neons.red.default,
+                color: colors.neons.orange.default,
                 columns: [
                     { headerKey: 'headers.marginOfSuccess', width: '50%' },
                     { headerKey: 'headers.bulletsHit', align: 'center' },
@@ -270,7 +284,7 @@ export const gmTableCategories: GMTableCategory[] = [
             {
                 key: 'suppressiveFire',
                 titleKey: 'tables.suppressiveFire.title',
-                color: colors.neons.red.default,
+                color: colors.neons.orange.default,
                 columns: [
                     { headerKey: 'headers.rule', width: '30%' },
                     { headerKey: 'headers.details' },
@@ -285,7 +299,7 @@ export const gmTableCategories: GMTableCategory[] = [
             {
                 key: 'fumbleRanged',
                 titleKey: 'tables.fumbleRanged.title',
-                color: colors.neons.red.default,
+                color: colors.neons.orange.default,
                 columns: [
                     { headerKey: 'headers.d6', align: 'center', width: '15%' },
                     { headerKey: 'headers.result' },
@@ -305,12 +319,12 @@ export const gmTableCategories: GMTableCategory[] = [
     {
         key: 'combatMelee',
         titleKey: 'categories.combatMelee',
-        color: colors.neons.red.default,
+        color: colors.neons.orange.default,
         tables: [
             {
                 key: 'brawlingDamage',
                 titleKey: 'tables.brawlingDamage.title',
-                color: colors.neons.red.default,
+                color: colors.neons.orange.default,
                 columns: [
                     { headerKey: 'headers.bodyStat', width: '50%' },
                     { headerKey: 'headers.damage', align: 'center' },
@@ -326,7 +340,7 @@ export const gmTableCategories: GMTableCategory[] = [
             {
                 key: 'martialArts',
                 titleKey: 'tables.martialArts.title',
-                color: colors.neons.red.default,
+                color: colors.neons.orange.default,
                 columns: [
                     { headerKey: 'headers.move', width: '25%' },
                     { headerKey: 'headers.effect' },
@@ -345,7 +359,7 @@ export const gmTableCategories: GMTableCategory[] = [
             {
                 key: 'fumbleMelee',
                 titleKey: 'tables.fumbleMelee.title',
-                color: colors.neons.red.default,
+                color: colors.neons.orange.default,
                 columns: [
                     { headerKey: 'headers.d6', align: 'center', width: '15%' },
                     { headerKey: 'headers.result' },
@@ -362,7 +376,7 @@ export const gmTableCategories: GMTableCategory[] = [
             {
                 key: 'shotgunRules',
                 titleKey: 'tables.shotgunRules.title',
-                color: colors.neons.red.default,
+                color: colors.neons.orange.default,
                 columns: [
                     { headerKey: 'headers.ammoType', width: '25%' },
                     { headerKey: 'headers.effect' },
@@ -375,7 +389,7 @@ export const gmTableCategories: GMTableCategory[] = [
             {
                 key: 'explosionDamage',
                 titleKey: 'tables.explosionDamage.title',
-                color: colors.neons.red.default,
+                color: colors.neons.orange.default,
                 columns: [
                     { headerKey: 'headers.distance', width: '30%', align: 'center' },
                     { headerKey: 'headers.damage' },

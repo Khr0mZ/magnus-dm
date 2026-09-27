@@ -57,10 +57,10 @@ const neons = {
         glow: '0 0 10px #FF0055, 0 0 20px #FF005550',
     },
     orange: {
-        default: '#FF5E00', // Neon orange
+        default: '#FF6533', // Neon orange
         light: '#FF8F4D',
         dark: '#CC4B00',
-        glow: '0 0 10px #FF5E00, 0 0 20px #FF5E0050',
+        glow: '0 0 10px #FF6533, 0 0 20px #FF653350',
     },
 }
 
@@ -90,7 +90,7 @@ const yellows = {
 }
 
 const oranges = {
-    default: '#FF5E00', // Cyber orange
+    default: '#FF6533', // Cyber orange
     light: '#FF8F4D',
     dark: '#CC4B00',
 }

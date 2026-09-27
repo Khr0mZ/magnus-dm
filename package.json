@@ -9,7 +9,7 @@
     "dev": "vinext dev",
     "build": "tsc --noEmit && vinext build",
     "start": "vinext start",
-    "test": "node --test tests/engine.test.mjs",
+    "test": "node --test tests/engine.test.mjs tests/localization.test.mjs",
     "test:render": "node --test tests/rendered-html.test.mjs",
     "lint": "eslint app lib tests --ignore-pattern work"
   },

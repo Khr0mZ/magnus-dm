@@ -1,0 +1,11 @@
+Localized correction made with the built-in ImageGen tool.
+References: public/magnus-city-reader.webp (edit target), public/magnus-city.webp (hollow logo reference).
+Final assets: public/magnus-city-reader-v2.webp and public/magnus-city-reader-mobile-v2.webp.
+
+Use case: precise-object-edit.
+Edit target image 1: the LIGHT city wallpaper.
+Reference image 2: the DARK city wallpaper with the correct hollow neon M emblem.
+
+Make ONE localized correction to image 1: on the billboard attached to the tower in the upper right, replace the INCORRECT SOLID FILLED teal M with the EXACT HOLLOW OUTLINE M from the dark reference. The user specifically rejects all the solid filled teal regions. This must be an outline-only angular M: narrow dark petrol-teal contour strokes, with the same light ivory billboard color visible inside EVERY broad band/arm/diagonal of the M. Trace the contours visible as cyan neon in image 2, render them as crisp dark teal outlines in daylight. No solid teal arms, no filled V, no large teal mass, no shading inside the M, no second nested logo, no redesign. The interior of the strokes should remain light, like an unfilled outlined vector path. Preserve all corners, endpoints, width and proportions from the dark outline reference.
+
+Keep the red laser starburst, the two MAGNUS LASER text lines, billboard size/position/perspective, architecture, trains, clouds, lighting, palette, and all other pixels as unchanged as possible. Do not redesign the city. Landscape 16:9 same dimensions/composition as image 1.

@@ -124,7 +124,7 @@ export const categories: GeneratorCategory[] = [
             { key: 'complication', color: colors.neons.yellow.default, generator: generateQuickComplication },
             { key: 'rumor', color: colors.neons.pink.default, generator: generateQuickRumor },
             { key: 'clue', color: colors.neons.cyan.default, generator: generateQuickClue },
-            { key: 'twist', color: colors.neons.red.default, generator: generateQuickTwist },
+            { key: 'twist', color: colors.neons.orange.default, generator: generateQuickTwist },
             { key: 'motivation', color: colors.neons.purple.default, generator: generateQuickMotivation },
             { key: 'mood', color: colors.neons.green.default, generator: generateQuickMood },
         ],
@@ -201,7 +201,7 @@ export const categories: GeneratorCategory[] = [
         generators: [
             { key: 'fashion', color: colors.neons.pink.default, generator: generateFashion },
             { key: 'fashionware', color: colors.neons.purple.default, generator: generateFashionware },
-            { key: 'blackIce', color: colors.neons.red.default, generator: generateBlackIce },
+            { key: 'blackIce', color: colors.neons.orange.default, generator: generateBlackIce },
             { key: 'firearm', color: colors.neons.orange.default, generator: generateFirearm },
             {
                 key: 'kibbleFlavor',
@@ -222,7 +222,7 @@ export const categories: GeneratorCategory[] = [
     },
     {
         key: 'corpseLoot',
-        color: colors.neons.red.default,
+        color: colors.neons.orange.default,
         generators: [
             {
                 key: 'lootStreetrat',
@@ -272,7 +272,7 @@ export const categories: GeneratorCategory[] = [
         color: colors.neons.cyan.default,
         generators: [
             { key: 'npcCompetence', color: colors.neons.cyan.default, generator: generateNpcCompetence },
-            { key: 'npcAggression', color: colors.neons.red.default, generator: generateNpcAggression },
+            { key: 'npcAggression', color: colors.neons.orange.default, generator: generateNpcAggression },
             { key: 'hateOrganization', color: colors.neons.orange.default, generator: generateHateOrganization },
             { key: 'highriderCareer', color: colors.neons.blue.default, generator: generateHighriderCareer },
             { key: 'aiLevel', color: colors.neons.purple.default, generator: wrapAiLevel },
@@ -306,11 +306,11 @@ export const categories: GeneratorCategory[] = [
     },
     {
         key: 'spmCombat',
-        color: colors.neons.red.default,
+        color: colors.neons.orange.default,
         generators: [
             { key: 'scatter', color: colors.neons.orange.default, generator: generateScatter },
             { key: 'hollywoodOveracting', color: colors.neons.pink.default, generator: generateHollywoodOveracting },
-            { key: 'aimPerson', color: colors.neons.red.default, generator: generateAttackerAimPerson },
+            { key: 'aimPerson', color: colors.neons.orange.default, generator: generateAttackerAimPerson },
             { key: 'aimVehicle', color: colors.neons.yellow.default, generator: generateAttackerAimVehicle },
         ],
     },
@@ -318,7 +318,7 @@ export const categories: GeneratorCategory[] = [
         key: 'spmMedical',
         color: colors.neons.green.default,
         generators: [
-            { key: 'surgicalComplication', color: colors.neons.red.default, generator: generateSurgicalComplication },
+            { key: 'surgicalComplication', color: colors.neons.orange.default, generator: generateSurgicalComplication },
             { key: 'medicalSymptom', color: colors.neons.green.default, generator: generateMedicalSymptom },
         ],
     },

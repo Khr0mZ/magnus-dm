@@ -1,5 +1,10 @@
 export * from '../lib/engine';
+export * from '../lib/open-oracle';
 export * from '../lib/session';
-export { gmTableCategories } from '../lib/reference';
-export { referenceLabel } from '../lib/i18n';
+export * from '../lib/session-library';
+export * from '../lib/explorer';
+export * from '../lib/drag-scroll';
+export { gmTableCategories, formatReference } from '../lib/reference';
+export { copyText } from '../lib/clipboard';
+export { referenceLabel, withLanguage, translate } from '../lib/i18n';
 export { generateRandomEncounter } from '../lib/soloPlayTablesExpanded';

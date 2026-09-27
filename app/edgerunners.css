@@ -1,0 +1,440 @@
+/* Edgerunners-inspired art direction: acid-yellow signals, ink surfaces,
+   hard cuts and chromatic offsets. The existing interaction/layout layers
+   own scrolling, hit areas, focus extraction and responsive form geometry.
+   Both modes use these same components; only the tokens/artwork change. */
+.application.edgerunners {
+  --bg: #090c10;
+  --panel: #11161bf5;
+  --panel-raised: #1c242b;
+  --input: #0b1015;
+  --border: #414d55;
+  --border-soft: #29343c;
+  --text: #f5f5ee;
+  --soft: #d0d9da;
+  --muted: #a1afb6;
+  --cyan: #4bf3de;
+  --cyan-dim: #133731;
+  --orange: #ff793d;
+  --pink: #ff74cc;
+  --green: #b0f567;
+  --blue: #73caff;
+  --yellow: #edfa35;
+  --acid: #edfa35;
+  --on-acid: #14180a;
+  --shadow: #03050799;
+  --wallpaper: url('/magnus-city.webp');
+  --wallpaper-mobile: url('/magnus-city-mobile.webp');
+  --wallpaper-wash: #090c1038;
+  --wallpaper-shade: #090c106b;
+  --category-strength: 58%;
+}
+.application.edgerunners.reader-mode {
+  --bg: #f4f2e8;
+  --panel: #faf9f1f5;
+  --panel-raised: #e9eadf;
+  --input: #fffef7;
+  --border: #929c97;
+  --border-soft: #cbd0c5;
+  --text: #192d30;
+  --soft: #344c50;
+  --muted: #536669;
+  --cyan: #006356;
+  --cyan-dim: #d5e9de;
+  --orange: #a53e0a;
+  --pink: #9b236a;
+  --green: #42610d;
+  --blue: #225c8a;
+  --yellow: #535e00;
+  --acid: #dfed33;
+  --on-acid: #14180a;
+  --shadow: #28332b26;
+  --wallpaper: url('/magnus-city-reader-v2.webp');
+  --wallpaper-mobile: url('/magnus-city-reader-mobile-v2.webp');
+  --wallpaper-wash: #f4f2e838;
+  --wallpaper-shade: #f4f2e86b;
+  --category-strength: 22%;
+}
+:root:has(.edgerunners) {
+  --scroll-thumb: #edfa35;
+  --scroll-end: #ff793d;
+  --scroll-hover: #4bf3de;
+  --scroll-track: #11161b;
+}
+:root:has(.edgerunners.reader-mode) {
+  --scroll-thumb: #687413;
+  --scroll-end: #a53e0a;
+  --scroll-hover: #006356;
+  --scroll-track: #e9eadf;
+}
+.edgerunners .cyber-background {
+  background-image: linear-gradient(90deg, var(--wallpaper-shade), var(--wallpaper-wash) 68%), var(--wallpaper);
+}
+.edgerunners .crt-overlay {
+  background: repeating-linear-gradient(0deg, transparent 0 3px, color-mix(in srgb, var(--cyan) 5%, transparent) 3px 4px);
+  box-shadow: inset 0 0 100px var(--wallpaper-shade);
+  opacity: .42;
+}
+.edgerunners :is(h1, h2, h3, h4) { text-shadow: none; letter-spacing: .02em; }
+.edgerunners ::selection { background: var(--acid); color: var(--on-acid); }
+.edgerunners :is(button, a, summary):focus-visible { outline-color: var(--yellow); }
+
+/* Compact masthead. The original Magnus mark remains untouched. */
+.edgerunners .site-header {
+  background: linear-gradient(110deg, color-mix(in srgb, var(--yellow) 5%, var(--bg)), var(--panel) 45%);
+  border-bottom-color: var(--border);
+  box-shadow: 0 5px 0 var(--shadow);
+}
+.edgerunners .site-header:before {
+  background: repeating-linear-gradient(0deg, transparent 0 4px, color-mix(in srgb, var(--cyan) 4%, transparent) 4px 5px);
+}
+.edgerunners .site-header:after {
+  height: 3px;
+  background: linear-gradient(90deg, var(--orange) 0 98px, transparent 98px calc(100% - 180px), var(--acid) calc(100% - 180px) calc(100% - 40px), transparent calc(100% - 40px));
+  box-shadow: none;
+}
+.edgerunners .header-channel { color: var(--yellow); border-color: var(--border); }
+.edgerunners .header-channel small { color: var(--soft); }
+.edgerunners .signal-bars i { background: var(--yellow); box-shadow: none; transform: skewX(-12deg); }
+.edgerunners .language-switch button {
+  border-color: var(--border);
+  background: var(--input);
+  box-shadow: 3px 3px 0 var(--shadow);
+  text-shadow: none;
+}
+.edgerunners .language-switch button[aria-pressed=true] {
+  color: var(--bg);
+  border-color: var(--orange);
+  background: var(--orange);
+  box-shadow: 3px 3px 0 var(--shadow);
+  text-shadow: none;
+}
+.edgerunners .language-switch button:hover { border-color: var(--orange); }
+.edgerunners .language-switch button[aria-pressed=true]:hover { color: var(--bg); }
+.edgerunners .language-switch button:after { height: 3px; inset-inline: 9px; }
+.edgerunners .language-link > span { box-shadow: none; }
+.edgerunners .mode-switch {
+  background: var(--input);
+  border-color: var(--pink);
+  box-shadow: inset -4px 0 var(--pink);
+}
+.edgerunners .mode-switch:hover { background: color-mix(in srgb, var(--pink) 12%, var(--input)); }
+.edgerunners .mode-switch i:after { box-shadow: none; }
+
+/* Root sections read as three big terminal keys, with a solid live key. */
+.edgerunners .drive-nav > button {
+  --drive: var(--yellow);
+  background: var(--panel);
+  border-left: 4px solid var(--drive);
+  box-shadow: inset 0 1px var(--border), inset 0 -1px var(--border);
+  color: var(--soft);
+  clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+}
+.edgerunners .drive-nav > button:nth-child(2) { --drive: var(--cyan); }
+.edgerunners .drive-nav > button:nth-child(3) { --drive: var(--pink); }
+.edgerunners .drive-nav > button:hover {
+  color: var(--drive);
+  background: color-mix(in srgb, var(--drive) 12%, var(--panel));
+  box-shadow: inset 0 1px var(--drive), inset 0 -3px var(--drive);
+}
+.edgerunners .drive-nav > button.active {
+  color: var(--on-acid);
+  background: var(--acid);
+  border-color: var(--acid);
+  box-shadow: inset 0 -4px var(--on-acid);
+  text-shadow: none;
+}
+.edgerunners .drive-nav > button:after { background: currentColor; box-shadow: none; height: 4px; }
+.edgerunners .drive-nav .drive-copy strong { font-weight: 800; letter-spacing: -.02em; }
+.edgerunners .drive-nav .drive-copy small { color: var(--soft); }
+.edgerunners .drive-nav > .active :is(.drive-icon, .drive-number, .drive-copy small, .drive-number small) { color: var(--on-acid); }
+.edgerunners .drive-nav .drive-number { font-size: 22px; font-style: italic; font-weight: 700; }
+.edgerunners .drive-nav .drive-number small { font-size: 14px; font-style: normal; }
+.edgerunners .drive-nav > .active:focus-visible { outline-color: var(--on-acid); }
+.edgerunners .section-intro h2 {
+  color: var(--text);
+  font-size: clamp(20px, 2.1vw, 28px);
+  font-weight: 800;
+  font-style: oblique 7deg;
+  line-height: 1.4;
+}
+.edgerunners .section-intro .eyebrow { color: var(--yellow); letter-spacing: .14em; }
+
+/* Shared surfaces are quieter so the signals and file colors carry hierarchy. */
+.edgerunners :is(.session-bar, .panel, .history-panel, .notes-panel, .tool-workspace, .reference-document) {
+  background: var(--panel);
+  border-color: var(--border);
+  border-radius: 0;
+  box-shadow: 5px 5px 0 var(--shadow);
+}
+.edgerunners .session-bar { border-left: 3px solid var(--orange); }
+.edgerunners .session-bar:before { box-shadow: none; height: 22px; width: 5px; }
+.edgerunners .session-picker label { font-weight: 700; }
+.edgerunners :is(.panel-heading h2, .sidebar-heading h2) { color: var(--text); text-shadow: none; }
+.edgerunners .panel-heading h2 > span {
+  display: inline-grid;
+  place-items: center;
+  min-width: 30px;
+  height: 26px;
+  padding-inline: 5px;
+  background: var(--acid);
+  color: var(--on-acid);
+  font-weight: 700;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%);
+}
+.edgerunners .panel > .panel-heading,
+.edgerunners .sidebar-heading {
+  background: var(--panel-raised);
+  border-color: var(--border-soft);
+  box-shadow: inset 4px 0 var(--yellow);
+}
+.edgerunners .oracle-panel { border-top: 3px solid var(--pink); }
+.edgerunners .oracle-panel > .panel-heading {
+  background: var(--panel-raised);
+  border-bottom-color: var(--border-soft);
+  box-shadow: inset 4px 0 var(--pink);
+}
+.edgerunners .oracle-panel .panel-heading h2 { color: var(--text); text-shadow: none; }
+.edgerunners .oracle-panel .panel-heading h2 > span { background: var(--pink); color: var(--bg); }
+.edgerunners .empty-state { border-color: var(--border-soft); background: transparent; }
+.edgerunners .empty-cross { color: var(--yellow); text-shadow: none; }
+
+/* Angular controls, solid primary actions and crisp, local focus signals. */
+.edgerunners :is(.primary-button, .secondary-button, .outline-button, .danger-button, .cyber-action) {
+  border-radius: 0;
+  box-shadow: none;
+  text-shadow: none;
+  letter-spacing: .025em;
+}
+.edgerunners .cyber-action {
+  background: var(--input);
+  border-color: color-mix(in srgb, var(--control-ink) 60%, var(--border));
+  border-left-width: 4px;
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+}
+.edgerunners .cyber-action:after { height: 3px; }
+.edgerunners .cyber-action:is(:hover:enabled, :focus-visible) {
+  background: color-mix(in srgb, var(--control-ink) 14%, var(--input));
+  box-shadow: inset 0 -2px var(--control-ink);
+  text-shadow: none;
+}
+.edgerunners :is(.primary-button.cyber-action, .oracle-submit, .session-action:first-child),
+.edgerunners .cyber-action:is([aria-pressed=true], [aria-expanded=true]) {
+  background: var(--control-ink);
+  color: var(--bg);
+  border-color: var(--control-ink);
+  box-shadow: none;
+}
+.edgerunners :is(.primary-button.cyber-action, .oracle-submit, .session-action:first-child):is(:hover:enabled, :focus-visible),
+.edgerunners .cyber-action:is([aria-pressed=true], [aria-expanded=true]):is(:hover:enabled, :focus-visible) {
+  background: color-mix(in srgb, var(--control-ink) 86%, var(--text));
+  color: var(--bg);
+  text-shadow: none;
+}
+.edgerunners .cyber-action:focus-visible { outline-color: currentColor; }
+.edgerunners .favorite-filter[aria-pressed=true] .favorite-mark { --panel: var(--control-ink); color: var(--bg); }
+.edgerunners :is(.primary-button, .secondary-button, .outline-button, .danger-button):not(.cyber-action) {
+  background: var(--input);
+  border-color: color-mix(in srgb, var(--button-neon) 65%, var(--border));
+  box-shadow: inset 3px 0 var(--button-neon);
+}
+.edgerunners :is(.primary-button, .secondary-button, .outline-button, .danger-button):not(.cyber-action):hover {
+  background: color-mix(in srgb, var(--button-neon) 12%, var(--input));
+  box-shadow: inset 3px 0 var(--button-neon), inset 0 -2px var(--button-neon);
+}
+.edgerunners :is(input:not([type=checkbox]), textarea, .cyber-select-trigger, .session-combo-field) {
+  background: var(--input);
+  border-radius: 0;
+  border-color: var(--border);
+  box-shadow: none;
+}
+.edgerunners :is(input, textarea)::placeholder { color: var(--muted); }
+.edgerunners :is(input:not([type=checkbox]), textarea):focus {
+  outline: 1px solid var(--cyan);
+  border-color: var(--cyan);
+  box-shadow: inset 3px 0 var(--cyan);
+}
+.edgerunners .session-combo-field { border-left-color: var(--orange); }
+.edgerunners .session-combo-field:is(:hover, :focus-within) { border-color: var(--orange); box-shadow: inset 0 -2px var(--orange); }
+.edgerunners .session-combo-field > button { color: var(--orange); }
+.edgerunners .session-combo-field input { background: transparent; border: 0; box-shadow: none; }
+.edgerunners .cyber-select-trigger { border-left-color: var(--cyan); }
+.edgerunners .cyber-select-trigger:is(:hover, [aria-expanded=true]) { box-shadow: inset 0 -2px var(--cyan); }
+.edgerunners :is(.cyber-select-menu, .session-suggestions, .directory-matrix) {
+  background: var(--bg);
+  border-color: var(--border);
+  border-top-color: var(--yellow);
+  box-shadow: 6px 6px 0 var(--shadow);
+}
+.edgerunners .cyber-select-option.is-cursor {
+  color: var(--on-acid);
+  background: var(--acid);
+  border-left-color: var(--on-acid);
+}
+.edgerunners .cyber-select-option.is-cursor:after { color: currentColor; }
+.edgerunners .segmented { background: var(--input); border-color: var(--border); padding: 0; gap: 0; }
+.edgerunners .segmented > button { padding: 10px 14px; color: var(--soft); }
+.edgerunners .segmented > button.selected { color: var(--bg); background: var(--pink); box-shadow: none; text-shadow: none; }
+.edgerunners .oracle-body .oracle-output {
+  background: color-mix(in srgb, var(--pink) 5%, var(--input));
+  border-color: var(--pink);
+}
+.edgerunners .oracle-output .oracle-answer { font-size: 22px; line-height: 1.5; }
+.edgerunners .oracle-source-picker label:has(:checked) { box-shadow: inset 0 -2px var(--pink); }
+
+/* File decks retain their fixed hover slots, light overlap and native swipe. */
+.edgerunners .data-stack {
+  background: linear-gradient(90deg, var(--panel), color-mix(in srgb, var(--panel) 20%, transparent));
+  border-top-color: color-mix(in srgb, var(--category-ink) 55%, var(--border));
+}
+.edgerunners .data-stack:before { width: 64px; height: 4px; box-shadow: none; }
+.edgerunners .stack-heading h3 > span { font-size: 18px; font-weight: 700; letter-spacing: .02em; }
+.edgerunners .stack-heading h3 small { font-size: 14px; font-weight: 400; }
+.edgerunners .stack-address i { opacity: .8; }
+.edgerunners .stack-file:before,
+.edgerunners .stack-file:after {
+  background: color-mix(in srgb, var(--category-ink) 12%, var(--bg));
+  border-color: color-mix(in srgb, var(--category-ink) 60%, var(--border));
+}
+.edgerunners .stack-file-open {
+  color: var(--text);
+  border-left: 4px solid var(--category-ink);
+  background: var(--panel);
+  box-shadow: inset 0 1px var(--category-ink), inset 0 -3px color-mix(in srgb, var(--category-ink) 60%, var(--border));
+  clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+}
+.edgerunners .stack-file-open:before {
+  inset: auto 0 8px auto;
+  width: 38px;
+  height: 12px;
+  opacity: .35;
+  background: repeating-linear-gradient(120deg, var(--category-ink) 0 3px, transparent 3px 8px);
+}
+.edgerunners .stack-file-open > strong { font-size: 15px; font-weight: 700; line-height: 1.55; letter-spacing: -.015em; }
+.edgerunners .file-stamp { color: var(--category-ink); }
+.edgerunners .file-stamp > span:first-child {
+  padding: 4px 5px;
+  border: 0;
+  background: var(--category-ink);
+  color: var(--bg);
+  font-weight: 700;
+  transform: skewX(-8deg);
+}
+.edgerunners .stack-file.is-open .stack-file-open {
+  background: color-mix(in srgb, var(--category-ink) 14%, var(--panel));
+  box-shadow: inset 0 1px var(--category-ink), inset 0 -5px var(--category-ink);
+}
+.edgerunners .stack-slot.is-hovered > .stack-file,
+.edgerunners .stack-files:not(:has(> .is-hovered)) > .stack-slot:has(:focus-visible) > .stack-file {
+  filter: drop-shadow(4px 6px 0 var(--shadow)) drop-shadow(-2px 0 0 var(--category-ink));
+}
+.edgerunners .stack-slot.is-hovered .stack-file-open > strong { color: var(--category-ink); }
+.edgerunners .shard-favorite { top: 2px; left: 57px; }
+.edgerunners .favorite-mark.is-active { filter: drop-shadow(1px 1px 0 var(--shadow)); }
+.edgerunners .stack-explorer .explorer-toolbar { border-color: var(--border); }
+.edgerunners .stack-explorer .search-field { background: var(--input); border-color: var(--border); border-left-color: var(--cyan); }
+.edgerunners .router-trigger { background: var(--input); border-color: var(--border); border-left-color: var(--category-ink); }
+.edgerunners .router-trigger:after { box-shadow: none; height: 3px; }
+.edgerunners .router-trigger:hover,
+.edgerunners .category-routing[open] .router-trigger { background: color-mix(in srgb, var(--category-ink) 10%, var(--input)); box-shadow: none; }
+.edgerunners .directory-port { background: var(--panel); }
+.edgerunners .directory-port[aria-pressed=true] { background: color-mix(in srgb, var(--category-ink) 15%, var(--panel)); }
+.edgerunners .directory-port:after { box-shadow: none; }
+.edgerunners .file-path strong { color: var(--yellow); }
+
+/* Open transmissions, tools and reference documents use the same hard edges. */
+.edgerunners .generated-result {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-left: 5px solid var(--yellow);
+  box-shadow: 5px 5px 0 var(--shadow);
+}
+.edgerunners .generated-result .eyebrow { color: var(--yellow); }
+.edgerunners .generated-result h3 { color: var(--text); font-size: 18px; font-weight: 800; text-shadow: none; }
+.edgerunners .generated-result > p { color: var(--soft); }
+.edgerunners .result-actions { border-color: var(--border); }
+.edgerunners .result-actions button { color: var(--cyan); }
+.edgerunners .result-actions button:hover { color: var(--yellow); }
+.edgerunners .dm-tools .tool-workspace {
+  background: var(--panel);
+  border-color: var(--border);
+  border-left: 4px solid var(--tool-ink);
+  box-shadow: 5px 5px 0 var(--shadow);
+}
+.edgerunners .tool-workspace .file-window-label { border-color: var(--border); font-weight: 700; }
+.edgerunners .tool-workspace .file-window-label:before { width: 8px; flex-basis: 8px; height: 22px; transform: skewX(-12deg); box-shadow: none; }
+.edgerunners .tool-workspace :is(.clock-record, .challenge-record, .record-details, .custom-table, .ip-row, .balance-grid) {
+  background: var(--input);
+  border-color: var(--border);
+  box-shadow: none;
+}
+.edgerunners .tool-workspace :is(.clock-record, .challenge-record, .record-details, .custom-table) { border-left-color: var(--tool-ink); }
+.edgerunners .tool-workspace .secondary-button.cyber-action { background: var(--input); }
+.edgerunners .tool-workspace .secondary-button.cyber-action:hover { background: color-mix(in srgb, var(--tool-ink) 12%, var(--input)); }
+.edgerunners .tool-workspace :is(input:not([type=checkbox]), textarea):focus { box-shadow: inset 3px 0 var(--tool-ink); outline-color: var(--tool-ink); }
+.edgerunners .clock-display > strong { color: var(--tool-ink); text-shadow: none; }
+.edgerunners .clock-segments > span { border-radius: 0; transform: skewX(-9deg); }
+.edgerunners .tool-workspace .clock-segments > span.lit { background: var(--tool-ink); border-color: var(--tool-ink); box-shadow: none; }
+.edgerunners .challenge-dots > .win { background: var(--green); color: var(--bg); border-color: var(--green); }
+.edgerunners .challenge-dots > .loss { background: var(--orange); color: var(--bg); border-color: var(--orange); }
+.edgerunners .reference-document { border-left: 4px solid var(--category-ink); }
+.edgerunners .document-heading { background: var(--panel-raised); border-color: var(--border); }
+.edgerunners .document-heading h4 { color: var(--text); }
+.edgerunners .table-scroll th { background: var(--input); color: var(--category-ink, var(--yellow)); border-color: var(--border); }
+.edgerunners .table-scroll td { border-color: var(--border-soft); }
+.edgerunners .table-scroll tbody tr:nth-child(even) td { background: color-mix(in srgb, var(--panel-raised) 45%, transparent); }
+.edgerunners .table-scroll tbody tr.highlight td { background: color-mix(in srgb, var(--category-ink, var(--yellow)) 12%, var(--panel)); }
+
+/* The log stays content-sized and keeps its single native scroll surface. */
+.edgerunners .session-sidebar { border-left: 0; padding-left: 0; }
+.edgerunners .history-panel:before { background: var(--acid); height: 3px; box-shadow: none; }
+.edgerunners .history-toolbar { background: var(--bg); }
+.edgerunners .history-filters { padding-block: 8px; gap: 8px; }
+.edgerunners .history-filters button { min-height: 34px; padding: 3px 9px; color: var(--soft); }
+.edgerunners .history-filters button.selected { color: var(--on-acid); background: var(--acid); }
+.edgerunners .count-badge { color: var(--on-acid); background: var(--acid); border-color: var(--acid); font-weight: 700; }
+.edgerunners .history-entry,
+.edgerunners .history-entry:last-child {
+  background: var(--input);
+  border-color: var(--border-soft);
+  border-left: 2px solid var(--cyan);
+  border-radius: 0;
+  box-shadow: none;
+}
+.edgerunners .history-entry.pinned { border-left-color: var(--yellow); }
+.edgerunners .history-entry.pinned:before { background: var(--yellow); }
+.edgerunners .history-entry h3 { color: var(--text); text-shadow: none; }
+.edgerunners .entry-meta > span { color: var(--cyan); }
+.edgerunners .entry-actions { gap: 5px; }
+.edgerunners .entry-actions button { width: 32px; min-height: 32px; color: var(--muted); }
+.edgerunners .entry-actions button:is(:hover, .selected) { background: var(--panel-raised); color: var(--yellow); }
+.edgerunners .entry-actions .delete-entry { color: var(--orange); }
+.edgerunners .history-empty > span { color: var(--yellow); text-shadow: none; }
+.edgerunners .history-empty .terminal-prompt { margin-top: 0; color: var(--cyan); }
+.edgerunners .history-foot { padding-block: 10px; border-color: var(--border-soft); }
+.edgerunners .history-foot i { border-radius: 0; box-shadow: none; background: var(--yellow); }
+.edgerunners .notes-panel textarea { background: transparent; border: 0; }
+.edgerunners .notes-panel .sidebar-heading { box-shadow: inset 4px 0 var(--cyan); }
+.edgerunners .note-dot { background: var(--cyan); border-color: var(--cyan); border-radius: 0; transform: rotate(45deg); box-shadow: none; }
+.edgerunners .toast { background: var(--acid); color: var(--on-acid); border-color: var(--acid); border-radius: 0; box-shadow: 5px 5px 0 var(--shadow); }
+.edgerunners .error-banner { color: var(--orange); background: var(--panel); border-color: var(--orange); }
+
+/* A brief color-channel split on interaction, never a continuous flash. */
+.edgerunners .drive-nav > button:hover .drive-copy strong,
+.edgerunners .language-switch button:hover strong,
+.edgerunners .mode-switch:hover strong { animation-name: edge-channel-split; }
+@keyframes edge-channel-split {
+  0%, 100% { text-shadow: none; }
+  25% { text-shadow: 2px 0 var(--pink), -2px 0 var(--cyan); }
+  50% { text-shadow: -1px 0 var(--pink), 1px 0 var(--cyan); }
+  75% { text-shadow: 1px 0 var(--pink), -1px 0 var(--cyan); }
+}
+@media (max-width: 600px) {
+  .edgerunners .cyber-background {
+    background-image: linear-gradient(90deg, var(--wallpaper-shade), var(--wallpaper-wash)), var(--wallpaper-mobile);
+  }
+  .edgerunners .section-intro h2 { font-size: 20px; }
+  .edgerunners .segmented > button { padding-inline: 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .edgerunners *, .edgerunners *:before, .edgerunners *:after { animation: none !important; transition: none !important; }
+}

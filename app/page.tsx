@@ -1,2 +1,3 @@
 import Workbench from './workbench';
-export default function Home() { return <Workbench />; }
+import { LocaleProvider } from './locale';
+export default function Home() { return <LocaleProvider><Workbench /></LocaleProvider>; }

@@ -37,3 +37,10 @@ export function appendEntry(session: Session, entry: Entry): Session {
   let recent = 0;
   return { ...session, history: history.filter(item => item.pinned || ++recent <= 200) };
 }
+
+// A reroll revises the existing result, retaining its place, date and pin.
+// Missing entries may have been removed/pruned: never resurrect them here.
+export function replaceEntryResult(session: Session, id: string, result: Pick<Entry, 'title' | 'text'>): Session {
+  if (!session.history.some(entry => entry.id === id)) return session;
+  return { ...session, history: session.history.map(entry => entry.id === id ? { ...entry, title: result.title, text: result.text } : entry) };
+}
