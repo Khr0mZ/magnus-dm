@@ -1,4 +1,5 @@
-export type Entry = { id: string; title: string; text: string; kind: string; time: number; pinned: boolean; generator?: string };
+export type MapLocation = { latitude: number; longitude: number };
+export type Entry = { id: string; title: string; text: string; kind: string; time: number; pinned: boolean; generator?: string; map?: MapLocation };
 export type Clock = { id: string; name: string; initial: number; remaining: number; escalate: boolean; rolls: number[]; luckUsed: boolean };
 export type NPC = { id: string; name: string; role: string; status: string; relationship: string; notes: string; stats: string };
 export type Scene = { id: string; name: string; location: string; participants: string; goal: string; outcome: string; done: boolean };
@@ -13,6 +14,7 @@ export function emptySession(): Session {
 const object = (v: unknown): v is Record<string, unknown> => !!v && typeof v === 'object' && !Array.isArray(v);
 const strings = (v: Record<string, unknown>, keys: string[]) => keys.every(key => typeof v[key] === 'string');
 const finite = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v);
+export const validMapLocation = (v: unknown): v is MapLocation => object(v) && finite(v.latitude) && finite(v.longitude) && Math.abs(v.latitude) <= 0.1 && Math.abs(v.longitude) <= 0.1;
 const integer = (v: unknown, min: number, max: number): v is number => finite(v) && Number.isInteger(v) && v >= min && v <= max;
 const list = (v: unknown, test: (v: Record<string, unknown>) => boolean): boolean => Array.isArray(v) && v.every(item => object(item) && test(item)) && new Set(v.map(item => item.id)).size === v.length;
 export function parseSession(raw: string): Session {
@@ -20,7 +22,7 @@ export function parseSession(raw: string): Session {
   if (!object(v) || v.version !== 1 || !strings(v, ['name', 'notes']) || typeof v.reader !== 'boolean'
     || !Array.isArray(v.favorites) || !v.favorites.every(x => typeof x === 'string')
     || !(v.mission === null || (object(v.mission) && Object.values(v.mission).every(x => typeof x === 'string')))
-    || !list(v.history, x => strings(x, ['id', 'title', 'text', 'kind']) && finite(x.time) && typeof x.pinned === 'boolean' && (x.generator === undefined || typeof x.generator === 'string'))
+    || !list(v.history, x => strings(x, ['id', 'title', 'text', 'kind']) && finite(x.time) && typeof x.pinned === 'boolean' && (x.generator === undefined || typeof x.generator === 'string') && (x.map === undefined || validMapLocation(x.map)))
     || !list(v.clocks, x => strings(x, ['id', 'name']) && integer(x.initial, 3, 10) && integer(x.remaining, 0, x.initial as number) && typeof x.escalate === 'boolean' && typeof x.luckUsed === 'boolean' && Array.isArray(x.rolls) && x.rolls.every(r => integer(r, 1, 6)))
     || !list(v.npcs, x => strings(x, ['id', 'name', 'role', 'status', 'relationship', 'notes', 'stats']))
     || !list(v.scenes, x => strings(x, ['id', 'name', 'location', 'participants', 'goal', 'outcome']) && typeof x.done === 'boolean')
@@ -35,7 +37,23 @@ export function parseSession(raw: string): Session {
 export function appendEntry(session: Session, entry: Entry): Session {
   const history = [entry, ...session.history];
   let recent = 0;
-  return { ...session, history: history.filter(item => item.pinned || ++recent <= 200) };
+  return { ...session, history: history.filter(item => item.pinned || item.map || ++recent <= 200) };
+}
+
+// One location per entry: placing an existing marker moves it without copying
+// its content, changing the log order or changing its pin/date/generator.
+export function placeEntryOnMap(session: Session, id: string, location: unknown): Session {
+  if (!validMapLocation(location) || !session.history.some(entry => entry.id === id)) return session;
+  return { ...session, history: session.history.map(entry => entry.id === id ? { ...entry, map: { latitude: location.latitude, longitude: location.longitude } } : entry) };
+}
+
+export function removeEntryFromMap(session: Session, id: string): Session {
+  return { ...session, history: session.history.map(entry => {
+    if (entry.id !== id || !entry.map) return entry;
+    const next = { ...entry };
+    delete next.map;
+    return next;
+  }) };
 }
 
 // A reroll revises the existing result, retaining its place, date and pin.

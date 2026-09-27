@@ -5,7 +5,7 @@
 .application .cyber-action {
   --control-ink: var(--cyan);
   position: relative; isolation: isolate; overflow: hidden; display: inline-flex; align-items: center; justify-content: center; gap: 9px;
-  min-height: 44px; padding: 10px 17px; border: 1px solid var(--control-ink); border-left-width: 3px; border-radius: 0;
+  min-height: 44px; padding: 10px 17px; border: 1px solid var(--control-ink); border-radius: 0;
   color: var(--control-ink); background: linear-gradient(115deg, color-mix(in srgb, var(--control-ink) 14%, var(--panel)), var(--input));
   font: 600 14px/1.5 var(--heading); letter-spacing: .04em; text-transform: uppercase;
   clip-path: polygon(0 0, calc(100% - 9px) 0, 100% 9px, 100% 100%, 9px 100%, 0 calc(100% - 9px));
@@ -26,7 +26,7 @@
 /* Top-level directories: cut terminal keys with a scan and a latched neon edge. */
 .application .drive-nav { gap: 10px; margin: 0 0 24px; }
 .application .drive-nav > button {
-  min-height: 100px; border: 0; border-left: 3px solid var(--drive); border-radius: 0; padding: 16px 14px; position: relative; isolation: isolate; overflow: hidden;
+  min-height: 100px; border: 0; border-radius: 0; padding: 16px 14px; position: relative; isolation: isolate; overflow: hidden;
   clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
   background: linear-gradient(110deg, color-mix(in srgb, var(--drive) 9%, var(--panel)), var(--input) 85%);
   box-shadow: inset 0 1px color-mix(in srgb, var(--drive) 60%, transparent), inset 0 -1px color-mix(in srgb, var(--drive) 45%, transparent);
@@ -63,7 +63,7 @@
 .language-link:before { content: ''; position: absolute; left: 0; right: 0; top: 7px; height: 1px; background: currentColor; box-shadow: 0 8px currentColor; opacity: .5; }
 .language-link > span { position: absolute; top: 9px; left: calc(50% - 2px); width: 4px; height: 5px; background: currentColor; box-shadow: 0 0 6px currentColor; transform: translateX(calc(var(--link-direction) * 5px)); animation: language-transfer .35s ease-out; }
 @keyframes language-transfer { from { transform: translateX(calc(var(--link-direction) * -5px)); opacity: .2; } to { transform: translateX(calc(var(--link-direction) * 5px)); opacity: 1; } }
-.application .mode-switch { position: relative; display: flex; align-items: center; gap: 10px; min-height: 54px; padding: 7px 12px; border: 1px solid var(--pink); border-left-width: 3px; color: var(--pink); background: color-mix(in srgb, var(--pink) 8%, var(--input)); clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%); }
+.application .mode-switch { position: relative; display: flex; align-items: center; gap: 10px; min-height: 54px; padding: 7px 12px; border: 1px solid var(--pink); color: var(--pink); background: color-mix(in srgb, var(--pink) 8%, var(--input)); clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%); }
 .mode-switch > span { text-align: left; }
 .mode-switch strong { display: block; font: 600 14px/1.3 var(--heading); letter-spacing: .04em; }
 .mode-switch small { display: block; font: 14px/1.3 var(--mono); color: var(--soft); }
@@ -76,21 +76,21 @@
 
 /* Custom listboxes keep the arrow beside the value and their menu on top. */
 .cyber-select { display: inline-flex; position: relative; min-width: 0; max-width: 100%; vertical-align: middle; }
-.application .cyber-select-trigger { display: flex; align-items: center; justify-content: flex-start; gap: 12px; min-width: 0; max-width: 100%; width: 100%; min-height: 44px; padding: 9px 14px; border: 1px solid var(--border); border-left: 3px solid var(--cyan); border-radius: 0; color: var(--text); background: linear-gradient(110deg, color-mix(in srgb, var(--cyan) 8%, var(--input)), var(--input)); text-align: left; font: 600 17px/1.4 'Rajdhani', sans-serif; transition: box-shadow .2s, border-color .2s; }
+.application .cyber-select-trigger { display: flex; align-items: center; justify-content: flex-start; gap: 12px; min-width: 0; max-width: 100%; width: 100%; min-height: 44px; padding: 9px 14px; border: 1px solid var(--border); border-radius: 0; color: var(--text); background: linear-gradient(110deg, color-mix(in srgb, var(--cyan) 8%, var(--input)), var(--input)); text-align: left; font: 600 17px/1.4 'Rajdhani', sans-serif; transition: box-shadow .2s, border-color .2s; }
 .cyber-select-trigger > span { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .cyber-select-trigger > svg { flex: 0 0 16px; color: var(--cyan); transition: transform .2s; }
 .application .cyber-select-trigger:is(:hover, [aria-expanded=true]) { border-color: var(--cyan); box-shadow: inset 0 -2px var(--cyan), 0 0 12px color-mix(in srgb, var(--cyan) 15%, transparent); }
 .cyber-select-trigger[aria-expanded=true] > svg { transform: rotate(180deg); }
 .application .cyber-select-menu { position: fixed; inset: auto; margin: 0; padding: 6px; border: 1px solid var(--cyan); border-top-width: 3px; background: var(--bg); color: var(--text); overflow: auto; box-shadow: 0 10px 35px color-mix(in srgb, var(--bg) 85%, transparent), 0 0 12px color-mix(in srgb, var(--cyan) 20%, transparent); }
 .cyber-select-menu:popover-open { display: grid; animation: directory-connect .18s ease-out; }
-.cyber-select-option { display: block; cursor: pointer; min-height: 44px; padding: 9px 13px; border-left: 3px solid transparent; font: 600 17px/1.5 'Rajdhani', sans-serif; overflow-wrap: anywhere; }
-.cyber-select-option.is-cursor { color: var(--cyan); border-left-color: var(--cyan); background: linear-gradient(90deg, color-mix(in srgb, var(--cyan) 15%, transparent), transparent); }
+.cyber-select-option { display: block; cursor: pointer; min-height: 44px; padding: 9px 13px; border: 0; font: 600 17px/1.5 'Rajdhani', sans-serif; overflow-wrap: anywhere; }
+.cyber-select-option.is-cursor { color: var(--cyan); background: linear-gradient(90deg, color-mix(in srgb, var(--cyan) 15%, transparent), transparent); }
 .cyber-select-option[aria-selected=true] { box-shadow: inset 0 -1px var(--border); color: var(--cyan); }
 .cyber-select-option[aria-selected=true]:after { content: ' //'; color: var(--orange); font-family: var(--mono); }
 .cyber-select-option[aria-disabled=true] { opacity: .4; cursor: default; }
 .session-combo { position: relative; flex: 0 1 470px; min-width: 0; }
 .session-bar:has(.session-combo.is-open) { z-index: 45; }
-.session-combo-field { display: flex; align-items: center; min-height: 44px; border: 1px solid var(--border); border-left: 3px solid var(--cyan); background: linear-gradient(110deg, color-mix(in srgb, var(--cyan) 8%, var(--input)), var(--input)); }
+.session-combo-field { display: flex; align-items: center; min-height: 44px; border: 1px solid var(--border); background: linear-gradient(110deg, color-mix(in srgb, var(--cyan) 8%, var(--input)), var(--input)); }
 .session-combo-field:focus-within, .session-combo-field:hover { border-color: var(--cyan); box-shadow: inset 0 -2px var(--cyan), 0 0 12px color-mix(in srgb, var(--cyan) 15%, transparent); }
 .application .session-combo-field input { min-width: 0; width: 100%; flex: 1; padding: 9px 12px; border: 0; background: none; box-shadow: none; font: 600 18px/1.4 'Rajdhani', sans-serif; }
 .session-combo-field input:focus-visible { outline-offset: -4px; }
@@ -126,13 +126,13 @@
 .tool-workspace:focus-visible { outline: 2px solid var(--tool-ink); outline-offset: 3px; }
 .tool-workspace .file-window-label > span { flex: 1; min-width: 0; }
 .tool-workspace .file-window-label > button { flex: 0 0 44px; width: 44px; height: 44px; color: var(--tool-ink); }
-.application .dm-tools .tool-workspace { --tool-control-height: 48px; border: 1px solid color-mix(in srgb, var(--tool-ink) 50%, var(--border)); border-left: 3px solid var(--tool-ink); border-radius: 0; padding: 18px; background: linear-gradient(115deg, color-mix(in srgb, var(--tool-ink) 4%, var(--panel)), var(--panel)); box-shadow: inset 0 2px color-mix(in srgb, var(--tool-ink) 35%, transparent); }
+.application .dm-tools .tool-workspace { --tool-control-height: 48px; border: 1px solid color-mix(in srgb, var(--tool-ink) 50%, var(--border)); border-radius: 0; padding: 18px; background: linear-gradient(115deg, color-mix(in srgb, var(--tool-ink) 4%, var(--panel)), var(--panel)); box-shadow: inset 0 2px color-mix(in srgb, var(--tool-ink) 35%, transparent); }
 .tool-workspace .file-window-label { color: var(--tool-ink); border-bottom-color: color-mix(in srgb, var(--tool-ink) 35%, transparent); text-transform: uppercase; letter-spacing: .06em; }
 .tool-workspace .file-window-label:before { content: ''; flex: 0 0 6px; height: 16px; background: var(--tool-ink); box-shadow: 0 0 10px color-mix(in srgb, var(--tool-ink) 35%, transparent); }
 .tool-workspace .tool-title { align-items: center; }
 .tool-workspace .tool-title h3 { font-size: 18px; color: var(--tool-ink); text-shadow: none; }
 .tool-workspace :is(.record-heading h4, .record-details summary strong, .mission-field label) { color: var(--tool-ink); }
-.tool-workspace :is(.clock-record, .challenge-record, .record-details, .custom-table) { border-radius: 0; border-color: color-mix(in srgb, var(--tool-ink) 35%, var(--border)); border-left: 2px solid var(--tool-ink); }
+.tool-workspace :is(.clock-record, .challenge-record, .record-details, .custom-table) { border-radius: 0; border-color: color-mix(in srgb, var(--tool-ink) 35%, var(--border));  }
 .tool-workspace .record-details[open] > summary { background: color-mix(in srgb, var(--tool-ink) 9%, transparent); }
 .tool-workspace .clock-segments > span.lit { border-color: var(--tool-ink); background: color-mix(in srgb, var(--tool-ink) 20%, var(--input)); box-shadow: inset 0 0 10px color-mix(in srgb, var(--tool-ink) 20%, transparent); }
 .application .tool-workspace .cyber-action { --control-ink: var(--tool-ink); min-height: var(--tool-control-height); }
@@ -149,8 +149,8 @@
 .application .tool-workspace input:not([type=checkbox]), .application .tool-workspace .cyber-select-trigger { height: var(--tool-control-height); min-height: var(--tool-control-height); padding: 10px 12px; font: 500 18px/24px 'Rajdhani', sans-serif; }
 .tool-workspace .tool-form .cyber-select { display: flex; }
 .application .tool-workspace :is(input:not([type=checkbox]), textarea, .cyber-select-trigger) { border-color: color-mix(in srgb, var(--tool-ink) 45%, var(--border)); border-radius: 0; }
-.application .tool-workspace :is(input:not([type=checkbox]), textarea):focus { border-color: var(--tool-ink); box-shadow: inset 3px 0 var(--tool-ink), 0 0 10px color-mix(in srgb, var(--tool-ink) 14%, transparent); }
-.application .tool-workspace .cyber-select-trigger { border-left-color: var(--tool-ink); }
+.application .tool-workspace :is(input:not([type=checkbox]), textarea):focus { border-color: var(--tool-ink); box-shadow: 0 0 10px color-mix(in srgb, var(--tool-ink) 14%, transparent); }
+.application .tool-workspace .cyber-select-trigger { border-color: var(--border); }
 .application .tool-workspace .cyber-select-trigger:is(:hover, [aria-expanded=true]) { border-color: var(--tool-ink); box-shadow: inset 0 -2px var(--tool-ink), 0 0 10px color-mix(in srgb, var(--tool-ink) 14%, transparent); }
 .tool-workspace .cyber-select-trigger > svg { color: var(--tool-ink); }
 .tool-workspace .cyber-select-menu { --cyan: var(--tool-ink); }
@@ -166,7 +166,7 @@
 .oracle-modes { grid-column: 1 / -1; width: fit-content; }
 .oracle-body > form { min-width: 0; }
 .oracle-body > form > input { width: 100%; font-size: 18px; }
-.oracle-body .oracle-output { min-width: 0; margin: 0; border-left: 2px solid var(--pink); border-top: 0; padding: 12px 16px; align-self: stretch; }
+.oracle-body .oracle-output { min-width: 0; margin: 0; border-left: 0; border-top: 0; padding: 12px 16px; align-self: stretch; }
 .oracle-output > .mono-label { color: var(--soft); text-transform: none; }
 .oracle-output p { white-space: pre-wrap; overflow-wrap: anywhere; margin-top: 10px; font: 500 18px/1.6 'Rajdhani', sans-serif; color: var(--text); }
 .oracle-output .oracle-answer { color: var(--pink); font-weight: 700; }

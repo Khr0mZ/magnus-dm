@@ -3,7 +3,7 @@ import test from 'node:test';
 import { build } from 'vite';
 import { fileURLToPath } from 'node:url';
 
-await build({ configFile: false, logLevel: 'silent', build: { outDir: 'work/tests', emptyOutDir: true, minify: false, lib: { entry: fileURLToPath(new URL('./entry.ts', import.meta.url)), formats: ['es'], fileName: () => 'engine.mjs' } } });
+await build({ configFile: false, publicDir: false, logLevel: 'silent', build: { outDir: 'work/tests', emptyOutDir: true, minify: false, lib: { entry: fileURLToPath(new URL('./entry.ts', import.meta.url)), formats: ['es'], fileName: () => 'engine.mjs' } } });
 const engine = await import('../work/tests/engine.mjs');
 
 test('mouse dragging scrolls files without activating them, preserving clicks, touch and keyboard', () => {
@@ -331,6 +331,47 @@ test('history retains the newest 200 results and all pinned entries', () => {
   assert.equal(session.history.length, 203);
   assert.equal(session.history[0].id, '219');
   assert.equal(session.history.filter(entry => entry.pinned).length, 3);
+});
+
+test('map markers share the saved log entry, move in place and remain isolated between sessions', () => {
+  const fixture = sessionStorageFixture();
+  const store = fixture.open();
+  const original = { id: 'contact', title: 'Zero', text: 'Fixer en Watson', kind: 'generador', generator: 'contactFull', time: 42, pinned: false };
+  store.setSession(current => engine.appendEntry(current, original));
+  store.setSession(current => engine.placeEntryOnMap(current, original.id, { latitude: 0.03, longitude: -0.04 }));
+  store.setSession(current => engine.placeEntryOnMap(current, original.id, { latitude: -0.02, longitude: 0.05 }));
+  store.setSession(current => engine.replaceEntryResult(current, original.id, { title: 'Zero / Afterlife', text: 'Nueva pista' }));
+  const linked = fixture.active(store).history[0];
+  assert.deepEqual(linked, { ...original, title: 'Zero / Afterlife', text: 'Nueva pista', map: { latitude: -0.02, longitude: 0.05 } });
+  assert.equal(fixture.active(store).history.length, 1, 'repeated placement and editing never duplicate the entry');
+  assert.deepEqual(fixture.active(fixture.open()).history[0], linked, 'location and edits survive reload');
+  store.createSession('other', 'Otra sesión');
+  assert.deepEqual(fixture.active(store).history, []);
+  store.setSession(current => engine.placeEntryOnMap(current, original.id, { latitude: 0, longitude: 0 }));
+  assert.deepEqual(fixture.active(store).history, [], 'a stale drag cannot create an entry in another session');
+  store.selectSession('initial');
+  assert.deepEqual(fixture.active(store).history[0], linked);
+  store.setSession(current => engine.removeEntryFromMap(current, original.id));
+  assert.deepEqual(fixture.active(store).history[0], { ...original, title: 'Zero / Afterlife', text: 'Nueva pista' });
+  assert.deepEqual(fixture.active(fixture.open()).history[0], fixture.active(store).history[0]);
+});
+
+test('mapped entries survive history pruning and invalid coordinates cannot alter saved sessions', () => {
+  let session = engine.appendEntry(engine.emptySession(), { id: 'marker', title: 'Pista', text: 'Persistente', kind: 'oráculo', time: 0, pinned: false });
+  const legacy = session;
+  assert.deepEqual(engine.parseSession(JSON.stringify(legacy)), legacy, 'old sessions need no location migration');
+  session = engine.placeEntryOnMap(session, 'marker', { latitude: 0, longitude: 0 });
+  for (let i = 0; i < 220; i++) session = engine.appendEntry(session, { id: `new-${i}`, title: 'Resultado', text: String(i), kind: 'generador', time: i, pinned: false });
+  assert.equal(session.history.length, 201);
+  assert.equal(session.history.at(-1).id, 'marker', 'mapped entries remain in their original position');
+  assert.deepEqual(engine.parseSession(JSON.stringify(session)), session);
+  for (const location of [null, {}, { latitude: 0.11, longitude: 0 }, { latitude: 0, longitude: -0.11 }, { latitude: '0', longitude: 0 }, { latitude: NaN, longitude: 0 }, { latitude: 0, longitude: Infinity }]) {
+    assert.equal(engine.placeEntryOnMap(session, 'marker', location), session);
+    assert.throws(() => engine.parseSession(JSON.stringify({ ...session, history: [{ ...session.history[0], map: location }] })));
+  }
+  const deleted = { ...session, history: session.history.filter(entry => entry.id !== 'marker') };
+  assert.equal(engine.placeEntryOnMap(deleted, 'marker', { latitude: 0, longitude: 0 }), deleted);
+  assert.equal(engine.replaceEntryResult(deleted, 'marker', { title: 'Stale save', text: '' }), deleted);
 });
 
 test('reroll replaces only its logged result, retaining order, pins and identity across reloads', () => {

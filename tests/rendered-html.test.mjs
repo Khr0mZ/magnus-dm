@@ -7,7 +7,7 @@ test('production page renders the DM workbench, Spanish metadata and no starter 
   assert.equal(response.status, 200);
   const html = await response.text();
   assert.match(html, /lang="es"/);
-  for (const text of ['Magnus Laser', 'Nueva sesión', 'Cambiar de sesión', 'Mesa del DM', 'Oráculo', 'Generadores', 'Notas de sesión', 'Herramientas de dirección']) assert.ok(html.includes(text), text);
+  for (const text of ['Magnus Laser', 'Nueva sesión', 'Cambiar de sesión', 'Mesa del DM', 'Oráculo', 'Generadores', 'Notas de sesión', 'Herramientas de dirección', 'Mapa de Night City']) assert.ok(html.includes(text), text);
   assert.ok(html.includes('https://magnus.example/og.png'));
   assert.doesNotMatch(html, /codex-preview|Your site is taking shape|react-loading-skeleton|terminal-hero/);
 });

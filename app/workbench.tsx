@@ -3,10 +3,10 @@
 /* eslint-disable @next/next/no-img-element */
 
 import { useEffect, useRef, useState } from 'react';
-import { Check, Copy, FileText, SquareTerminal, CircuitBoard, Database, Cpu, Fingerprint, Pin, RotateCcw, Trash2, Zap } from 'lucide-react';
+import { Check, Copy, FileText, SquareTerminal, CircuitBoard, Database, MapPinned, Cpu, Fingerprint, Pin, RotateCcw, Trash2, Zap } from 'lucide-react';
 import { formatResult, getGeneratorGroups, uid } from '../lib/engine';
 import { generateRandomEncounter, type EncounterTime, type EncounterZone } from '../lib/soloPlayTablesExpanded';
-import { appendEntry, replaceEntryResult, type Entry } from '../lib/session';
+import { appendEntry, placeEntryOnMap, removeEntryFromMap, replaceEntryResult, type Entry, type MapLocation } from '../lib/session';
 import { gmTableCategories } from '../lib/reference';
 import { useSession } from './use-session';
 import { Empty, PanelHeading, ToolLink } from './ui';
@@ -20,6 +20,8 @@ import { copyText } from '../lib/clipboard';
 import SessionBar from './session-bar';
 import CyberSelect from './cyber-select';
 import OraclePanel from './oracle-panel';
+import NightCityMap, { ENTRY_DRAG_TYPE } from './night-city-map';
+import MapEntryEditor from './map-entry-editor';
 
 export default function Workbench() {
   const store = useSession();
@@ -34,6 +36,9 @@ function SessionWorkbench({ store }: { store: ReturnType<typeof useSession> }) {
   const generatorByKey = (key: string) => allGenerators.find(gen => gen.key === key);
   const { session, setSession, ready, error } = store;
   const [tab, setTab] = useState('desk');
+  const [mapOpened, setMapOpened] = useState(false);
+  const [pendingMapEntryId, setPendingMapEntryId] = useState<string | null>(null);
+  const [editingMapEntryId, setEditingMapEntryId] = useState<string | null>(null);
   const [query, setQuery] = useState('');
   const [pinnedOnly, setPinnedOnly] = useState(false);
   const [notice, setNotice] = useState('');
@@ -73,6 +78,20 @@ function SessionWorkbench({ store }: { store: ReturnType<typeof useSession> }) {
   function toggleFavorite(key: string) {
     store.toggleFavorite('generators', key);
   }
+  function openMap() {
+    setMapOpened(true);
+    setTab('map');
+    setQuery('');
+  }
+  function startMapPlacement(id: string) {
+    setPendingMapEntryId(id);
+    openMap();
+  }
+  function placeMapEntry(id: string, location: MapLocation) {
+    setSession(current => placeEntryOnMap(current, id, location));
+    setPendingMapEntryId(null);
+    setNotice(t('Marcador guardado en el mapa.'));
+  }
   async function copy(text: string) {
     try { await copyText(text); setNotice(t("Copiado al portapapeles.")); }
     catch { setNotice(t("No se ha podido copiar. Comprueba los permisos del portapapeles.")); }
@@ -84,13 +103,14 @@ function SessionWorkbench({ store }: { store: ReturnType<typeof useSession> }) {
   function goGenerators() { setQuery(''); setTab('generators'); setTimeout(() => searchRef.current?.focus(), 0); }
   const history = session.history.filter(entry => !pinnedOnly || entry.pinned);
   const latest = session.history.find(entry => entry.id === latestId) ?? null;
+  const editingMapEntry = session.history.find(entry => entry.id === editingMapEntryId && entry.map);
   const featured = store.favorites.generators.map(generatorByKey).filter((v): v is NonNullable<typeof v> => !!v);
   const referenceCount = gmTableCategories.reduce((n, c) => n + c.tables.length, 0);
 
   const resultPanel = latest ? (<section className="generated-result" aria-live="polite"><div className="result-top"><span className="eyebrow">{t("NUEVA TRANSMISIÓN")}</span><button className="text-button" onClick={() => setLatestId(null)}>{t("Ocultar")}</button></div><h3>{latest.title}</h3><p>{latest.text}</p><div className="result-actions"><button onClick={() => toNotes(latest)}><FileText size={14} />{t("A notas")}</button><button onClick={() => copy(latest.text)}><Copy size={14} />{t("Copiar")}</button>{latest.generator && <button onClick={() => reroll(latest)}><RotateCcw size={14} />{t("Regenerar")}</button>}{latest.generator === 'contactFull' && <button onClick={() => { setSession(current => ({ ...current, npcs: [...current.npcs, { id: uid(), name: latest.text.split('\n')[0].replace(/^(Nombre|Name): /, ''), role: t('Contacto'), status: 'Vivo', relationship: 'Neutral', notes: latest.text, stats: '' }] })); setNotice(t("Contacto añadido al registro de PNJ.")); }}><Check size={14} />{t("Registrar PNJ")}</button>}</div></section>) : null;
 
   return <div className={`application edgerunners ${session.reader ? 'reader-mode' : ''}`}>
-    <CyberBackground />
+    <CyberBackground reader={session.reader} />
     <a className="skip-link" href="#workspace">{t("Saltar a las herramientas")}</a>
     <header className="site-header">
       <div className="brand"><img src="/magnus-laser.png" alt="Magnus Laser" width="64" height="64" /></div>
@@ -119,7 +139,8 @@ function SessionWorkbench({ store }: { store: ReturnType<typeof useSession> }) {
               { key: 'desk', name: t('Mesa del DM'), detail: t('Dirigir la sesión'), count: 9, icon: SquareTerminal },
               { key: 'generators', name: t('Generadores'), detail: t('Ejecutar generadores'), count: allGenerators.length + 1, icon: CircuitBoard },
               { key: 'reference', name: t('Tablas de referencia'), detail: t('Consultar archivos'), count: referenceCount, icon: Database },
-            ].map((item, index) => <button key={item.key} className={tab === item.key ? 'active' : ''} aria-current={tab === item.key ? 'page' : undefined} onClick={() => { setTab(item.key); setQuery(''); }}>
+              { key: 'map', name: t('Mapa de Night City'), detail: t('Explorar la ciudad'), count: 'circa 2080', icon: MapPinned },
+            ].map((item, index) => <button key={item.key} className={tab === item.key ? 'active' : ''} aria-current={tab === item.key ? 'page' : undefined} onDragEnter={event => { if (ready && item.key === 'map' && Array.from(event.dataTransfer.types).includes(ENTRY_DRAG_TYPE)) openMap(); }} onClick={() => { setTab(item.key); setQuery(''); if (item.key === 'map') setMapOpened(true); }}>
               <span className="drive-icon" aria-hidden="true"><item.icon size={28}/></span>
               <span className="drive-copy"><strong>{item.name}</strong><small>{item.detail}</small></span>
               <span className="drive-number">{String(index + 1).padStart(2, '0')}<small>{item.count}</small></span>
@@ -143,12 +164,22 @@ function SessionWorkbench({ store }: { store: ReturnType<typeof useSession> }) {
 
             {tab === 'desk' && <DMTools session={session} setSession={setSession} log={log} notify={setNotice} />}
             {tab === 'reference' && <ReferenceExplorer query={query} setQuery={setQuery} favorites={store.favorites.references} onFavorite={key => store.toggleFavorite('references', key)} />}
+            {mapOpened && <NightCityMap reader={session.reader} hidden={tab !== 'map'} enabled={ready} sessionId={store.activeId} entries={session.history} pendingEntryId={pendingMapEntryId} onPlace={placeMapEntry} onEdit={setEditingMapEntryId} onCancelPlacement={() => setPendingMapEntryId(null)} />}
           </fieldset>
         </div>
 
-        <aside className="session-sidebar" aria-label={t("Registro y notas de la sesión")}><section className="history-panel" tabIndex={0} aria-labelledby="session-log-heading"><div className="history-toolbar"><div className="sidebar-heading"><h2 id="session-log-heading">{t("Registro de sesión")}</h2><span className="count-badge">{session.history.length}</span></div><div className="history-filters"><button className={!pinnedOnly ? 'selected' : ''} onClick={() => setPinnedOnly(false)}>{t("Todo")}</button><button className={pinnedOnly ? 'selected' : ''} onClick={() => setPinnedOnly(true)}><Pin size={12} />{t("Fijados")}</button></div></div><div className="history-feed">{history.length === 0 ? <div className="history-empty"><span>{t("ESPERANDO SEÑAL")}</span><p>{pinnedOnly ? t("Fija resultados para encontrarlos aquí.") : t("Tus tiradas, encuentros y descubrimientos aparecerán aquí.")}</p><div className="terminal-prompt">{t("> inicia la historia")}<span>_</span></div></div> : history.map(entry => <article className={`history-entry ${entry.pinned ? 'pinned' : ''}`} key={entry.id}><div className="entry-meta"><span>{t(entry.kind).toUpperCase()}</span><time>{new Date(entry.time).toLocaleTimeString(language, { hour: '2-digit', minute: '2-digit' })}</time></div><h3>{entry.title}</h3><p>{entry.text}</p><div className="entry-actions"><button title={t("Fijar resultado")} aria-label={t("Fijar {v0}", {v0: entry.title})} aria-pressed={entry.pinned} className={entry.pinned ? 'selected' : ''} onClick={() => setSession(current => ({ ...current, history: current.history.map(item => item.id === entry.id ? { ...item, pinned: !item.pinned } : item) }))}><Pin size={13} /></button><button title={t("Copiar")} aria-label={t("Copiar {v0}", {v0: entry.title})} onClick={() => copy(entry.text)}><Copy size={13} /></button><button title={t("Añadir a notas")} aria-label={t("Añadir {v0} a notas", {v0: entry.title})} onClick={() => toNotes(entry)}><FileText size={13} /></button>{entry.generator && <button title={t("Regenerar")} aria-label={t("Regenerar {v0}", {v0: entry.title})} onClick={() => reroll(entry)}><RotateCcw size={13} /></button>}<button className="delete-entry" title={t("Eliminar resultado")} aria-label={t("Eliminar {v0}", {v0: entry.title})} onClick={() => { setSession(current => ({ ...current, history: current.history.filter(item => item.id !== entry.id) })); if (latest?.id === entry.id) setLatestId(null); }}><Trash2 size={13} /></button></div></article>)}</div><div className="history-foot"><i />{t("200 resultados recientes + todos tus fijados")}</div></section><section className="notes-panel"><div className="sidebar-heading"><h2>{t("Notas de sesión")}</h2><span className="note-dot" /></div><textarea aria-label={t("Notas de sesión")} disabled={!ready} value={session.notes} onChange={event => setSession(current => ({ ...current, notes: event.target.value }))} placeholder={t("Contactos, pistas, deudas pendientes…\n\nLo que pasa en Night City, se queda aquí.")} /><div className="notes-foot"><span>{session.notes.length} {t("caracteres")}</span><span><Check size={12} />{t("Autoguardado")}</span></div></section></aside>
+        <aside className="session-sidebar" aria-label={t("Registro y notas de la sesión")}><section className="history-panel" tabIndex={0} aria-labelledby="session-log-heading"><div className="history-toolbar"><div className="sidebar-heading"><h2 id="session-log-heading">{t("Registro de sesión")}</h2><span className="count-badge">{session.history.length}</span></div><div className="history-filters"><button className={!pinnedOnly ? 'selected' : ''} onClick={() => setPinnedOnly(false)}>{t("Todo")}</button><button className={pinnedOnly ? 'selected' : ''} onClick={() => setPinnedOnly(true)}><Pin size={12} />{t("Fijados")}</button></div></div><div className="history-feed">{history.length === 0 ? <div className="history-empty"><span>{t("ESPERANDO SEÑAL")}</span><p>{pinnedOnly ? t("Fija resultados para encontrarlos aquí.") : t("Tus tiradas, encuentros y descubrimientos aparecerán aquí.")}</p><div className="terminal-prompt">{t("> inicia la historia")}<span>_</span></div></div> : history.map(entry => <article className={`history-entry ${entry.pinned ? 'pinned' : ''}`} key={entry.id} draggable={ready} onDragStart={event => {
+          if (!ready || (event.target as HTMLElement).closest('button')) { event.preventDefault(); return; }
+          event.dataTransfer.setData(ENTRY_DRAG_TYPE, JSON.stringify({ sessionId: store.activeId, entryId: entry.id }));
+          event.dataTransfer.setData('text/plain', entry.title);
+          event.dataTransfer.effectAllowed = 'copyMove';
+        }}><div className="entry-meta"><span>{t(entry.kind).toUpperCase()}</span><time>{new Date(entry.time).toLocaleTimeString(language, { hour: '2-digit', minute: '2-digit' })}</time></div><h3>{entry.title}</h3><p>{entry.text}</p><div className="entry-actions"><button disabled={!ready} title={t(entry.map ? 'Mover marcador en el mapa' : 'Colocar en el mapa')} aria-label={t('Colocar {v0} en el mapa', {v0: entry.title})} className={entry.map ? 'selected map-entry-action' : 'map-entry-action'} onClick={() => startMapPlacement(entry.id)}><MapPinned size={15} /></button><button title={t("Fijar resultado")} aria-label={t("Fijar {v0}", {v0: entry.title})} aria-pressed={entry.pinned} className={entry.pinned ? 'selected' : ''} onClick={() => setSession(current => ({ ...current, history: current.history.map(item => item.id === entry.id ? { ...item, pinned: !item.pinned } : item) }))}><Pin size={13} /></button><button title={t("Copiar")} aria-label={t("Copiar {v0}", {v0: entry.title})} onClick={() => copy(entry.text)}><Copy size={13} /></button><button title={t("Añadir a notas")} aria-label={t("Añadir {v0} a notas", {v0: entry.title})} onClick={() => toNotes(entry)}><FileText size={13} /></button>{entry.generator && <button title={t("Regenerar")} aria-label={t("Regenerar {v0}", {v0: entry.title})} onClick={() => reroll(entry)}><RotateCcw size={13} /></button>}<button className="delete-entry" title={t("Eliminar resultado")} aria-label={t("Eliminar {v0}", {v0: entry.title})} onClick={() => { setSession(current => ({ ...current, history: current.history.filter(item => item.id !== entry.id) })); if (latest?.id === entry.id) setLatestId(null); }}><Trash2 size={13} /></button></div></article>)}</div><div className="history-foot"><i />{t("200 resultados recientes + fijados y marcadores")}</div></section><section className="notes-panel"><div className="sidebar-heading"><h2>{t("Notas de sesión")}</h2><span className="note-dot" /></div><textarea aria-label={t("Notas de sesión")} disabled={!ready} value={session.notes} onChange={event => setSession(current => ({ ...current, notes: event.target.value }))} placeholder={t("Contactos, pistas, deudas pendientes…\n\nLo que pasa en Night City, se queda aquí.")} /><div className="notes-foot"><span>{session.notes.length} {t("caracteres")}</span><span><Check size={12} />{t("Autoguardado")}</span></div></section></aside>
       </div>
     </main>
+    {editingMapEntry && <MapEntryEditor key={editingMapEntry.id} entry={editingMapEntry} enabled={ready}
+      onClose={() => setEditingMapEntryId(null)}
+      onSave={result => { setSession(current => replaceEntryResult(current, editingMapEntry.id, result)); setEditingMapEntryId(null); setNotice(t('Entrada y marcador actualizados.')); }}
+      onRemove={() => { setSession(current => removeEntryFromMap(current, editingMapEntry.id)); setEditingMapEntryId(null); setNotice(t('Marcador quitado. La entrada sigue en el registro.')); }} />}
     {notice && <div className="toast" role="status"><Check size={16} />{notice}</div>}
   </div>;
 }

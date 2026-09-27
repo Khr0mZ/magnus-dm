@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="es" data-theme="chrome">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex">
+    <title>Magnus Laser — Night City</title>
+    <link rel="icon" href="/favicon.png">
+    <link rel="stylesheet" href="./preview.css">
+    <script type="module" src="./preview.js"></script>
+  </head>
+  <body>
+    <header class="map-header">
+      <img class="brand-logo" src="/magnus-laser.png" alt="Magnus Laser" width="52" height="52">
+      <h1>Night City <span>/ circa 2080</span></h1>
+      <div class="theme-switch" role="group" aria-label="Aspecto del mapa">
+        <button type="button" data-theme-button="chrome" aria-pressed="true">Chrome</button>
+        <button type="button" data-theme-button="flesh" aria-pressed="false">Flesh</button>
+      </div>
+      <a class="back-link" href="/">Volver a la mesa</a>
+    </header>
+    <main>
+      <div id="map" tabindex="0" role="region" aria-label="Mapa de Night City. Arrastra para desplazarte. Usa las flechas para mover el mapa, más y menos para el zoom, e Inicio para ver todo el mapa." aria-describedby="map-hint">
+        <div id="tiles" aria-hidden="true"></div>
+        <div id="map-loader" class="image-loader" role="status"><span class="image-loader-signal" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span id="map-loading-label">Cargando mapa…</span><progress id="map-load-progress" value="0" max="1" aria-labelledby="map-loading-label"></progress></div>
+        <div id="map-markers" role="group" aria-label="Marcadores de la sesión"></div>
+        <div id="placement-banner" hidden><span id="placement-instruction" role="status"></span><button id="cancel-placement" type="button">Cancelar</button></div>
+        <div class="map-controls" role="group" aria-label="Controles del mapa">
+          <button id="zoom-in" type="button" aria-label="Acercar">+</button>
+          <button id="zoom-out" type="button" aria-label="Alejar">−</button>
+          <button id="fit-map" type="button" aria-label="Ver todo el mapa">⌂</button>
+        </div>
+        <div class="map-info">
+          <span id="position"></span>
+          <span id="load-status" role="status"></span>
+        </div>
+        <div class="map-attribution">Game data © CD PROJEKT RED · Map © <a href="https://nightcitynavigator.com/copyright" target="_blank" rel="noopener noreferrer">Night City Navigator y colaboradores</a> · ODbL</div>
+      </div>
+      <p id="map-hint">Arrastra o usa las flechas · Rueda o pellizco para el zoom · Chrome: cyberpunk · Flesh: mapa original</p>
+    </main>
+  </body>
+</html>

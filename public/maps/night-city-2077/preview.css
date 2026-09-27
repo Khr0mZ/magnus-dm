@@ -1,0 +1,114 @@
+@font-face { font-family: Orbitron; src: url('/fonts/orbitron-600.ttf') format('truetype'); font-weight: 600; font-display: swap; }
+@font-face { font-family: Rajdhani; src: url('/fonts/rajdhani-500.ttf') format('truetype'); font-weight: 500; font-display: swap; }
+@font-face { font-family: 'Share Tech Mono'; src: url('/fonts/share-tech-mono-400.ttf') format('truetype'); font-display: swap; }
+:root {
+  color-scheme: dark;
+  --bg: #090c10;
+  --surface: #11161b;
+  --text: #f5f5ee;
+  --soft: #d0d9da;
+  --border: #414d55;
+  --cyan: #4bf3de;
+  --orange: #ff793d;
+  --acid: #edfa35;
+  --pink: #ff74cc;
+  --shadow: #03050799;
+  --artwork: url('/magnus-city.webp');
+  --map-bg: var(--surface);
+  /* Lower the inverted beige below the ink surface, then lift each channel
+     to that surface with lighten blending. Keep the colored map details. */
+  --map-filter: invert(1) hue-rotate(180deg) saturate(1.5) brightness(1.18) contrast(1.1);
+  --map-blend: lighten;
+}
+:root[data-theme='flesh'] {
+  color-scheme: light;
+  --bg: #f4f2e8;
+  --surface: #faf9f1;
+  --text: #192d30;
+  --soft: #344c50;
+  --border: #929c97;
+  --cyan: #006356;
+  --orange: #a53e0a;
+  --acid: #dfed33;
+  --pink: #9b236a;
+  --shadow: #28332b26;
+  --artwork: url('/magnus-city-reader-v2.webp');
+  --map-bg: #f2efe9;
+  --map-filter: none;
+  --map-blend: normal;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: linear-gradient(var(--bg), transparent), var(--artwork) center / cover fixed; color: var(--text); font: 500 18px Rajdhani, sans-serif; user-select: none; }
+button, a { -webkit-tap-highlight-color: transparent; }
+button { height: 48px; padding: 0 20px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font: inherit; cursor: pointer; }
+button:hover { color: var(--cyan); border-color: var(--cyan); }
+button:disabled { opacity: .4; cursor: default; }
+:is(button, a, #map):focus-visible { outline: 2px solid var(--acid); outline-offset: 3px; }
+a { color: var(--cyan); text-underline-offset: 3px; }
+.map-header { display: flex; align-items: center; gap: 20px; min-height: 76px; padding: 10px 24px; border-bottom: 2px solid var(--orange); background: var(--surface); box-shadow: 0 5px 0 var(--shadow); }
+.brand-logo { object-fit: contain; }
+h1 { margin: 0; font: 600 20px Orbitron, sans-serif; letter-spacing: .02em; }
+h1 span { color: var(--soft); font: 500 16px Rajdhani, sans-serif; white-space: nowrap; }
+.theme-switch { display: flex; margin-left: auto; border: 1px solid var(--border); box-shadow: 4px 4px 0 var(--shadow); }
+.theme-switch button { border: 0; }
+.theme-switch button + button { border-left: 1px solid var(--border); }
+.theme-switch button[aria-pressed='true'] { background: var(--acid); color: #14180a; }
+.back-link { padding: 12px 0; white-space: nowrap; font-size: 16px; }
+main { padding: 22px 24px 8px; }
+#map { position: relative; height: calc(100svh - 148px); min-height: 380px; overflow: hidden; border: 1px solid var(--border); background: var(--map-bg); box-shadow: 6px 6px 0 var(--shadow); cursor: grab; touch-action: none; isolation: isolate; }
+#map.dragging { cursor: grabbing; }
+#tiles { position: absolute; inset: 0; pointer-events: none; filter: var(--map-filter); mix-blend-mode: var(--map-blend); }
+#tiles img { position: absolute; width: 256px; height: 256px; max-width: none; user-select: none; }
+#tiles img.missing { visibility: hidden; }
+.image-loader { display: grid; justify-items: center; gap: 12px; padding: 18px 24px; background: var(--surface); color: var(--soft); font: 16px/1.5 'Share Tech Mono', monospace; box-shadow: 5px 5px 0 var(--shadow); clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px)); }
+.image-loader-signal { display: flex; gap: 5px; }
+.image-loader-signal i { display: block; width: 10px; height: 16px; transform: skewX(-12deg); background: var(--cyan); animation: image-signal-pulse 1s ease-in-out infinite; }
+.image-loader-signal i:nth-child(2) { animation-delay: .15s; }
+.image-loader-signal i:nth-child(3) { animation-delay: .3s; }
+.image-loader-signal i:nth-child(4) { animation-delay: .45s; background: var(--orange); }
+#map-loader { position: absolute; z-index: 4; top: 50%; left: 50%; transform: translate(-50%, -50%); max-width: calc(100% - 32px); pointer-events: none; }
+#map-loader[hidden] { display: none; }
+#map-load-progress { display: block; width: 160px; height: 4px; border: 0; appearance: none; background: var(--border); accent-color: var(--cyan); }
+#map-load-progress::-webkit-progress-bar { background: var(--border); }
+#map-load-progress::-webkit-progress-value { background: var(--cyan); }
+#map-load-progress::-moz-progress-bar { background: var(--cyan); }
+@keyframes image-signal-pulse { 0%, 100% { opacity: .3; } 50% { opacity: 1; } }
+#map-markers { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
+.map-marker { position: absolute; transform: translate(-16px, -100%); pointer-events: auto; width: max-content; max-width: 240px; height: auto; min-height: 48px; padding: 0 0 16px; border: 0; background: transparent; text-align: left; cursor: pointer; }
+.map-marker span { display: block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 4px 10px; border: 0; background: var(--orange); color: var(--bg); font-size: 16px; box-shadow: 3px 3px 0 var(--shadow); }
+.map-marker::before { content: ''; position: absolute; bottom: 0; left: 8px; width: 16px; height: 16px; background: var(--orange); clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
+.map-marker:is(:hover, :focus-visible) { z-index: 2; }
+.map-marker:is(:hover, :focus-visible) span { color: var(--bg); background: var(--acid); }
+#placement-banner { position: absolute; z-index: 3; top: 16px; left: 16px; max-width: calc(100% - 96px); display: flex; align-items: center; gap: 12px; padding: 8px 12px; border: 0; background: color-mix(in srgb, var(--orange) 16%, var(--surface)); box-shadow: 3px 3px 0 var(--shadow); }
+#placement-banner[hidden] { display: none; }
+#placement-instruction { font-size: 16px; line-height: 1.35; }
+#cancel-placement { flex: 0 0 auto; font-size: 16px; }
+#map.placing { cursor: crosshair; }
+#map.placing::after { content: ''; position: absolute; z-index: 1; top: 50%; left: 50%; width: 20px; height: 20px; transform: translate(-50%, -50%); border: 2px solid var(--cyan); pointer-events: none; }
+#map.drop-target { box-shadow: inset 0 0 0 3px var(--cyan); }
+.map-controls { position: absolute; z-index: 2; top: 16px; right: 16px; display: grid; gap: 8px; }
+.map-controls button { width: 48px; padding: 0; font-size: 26px; box-shadow: 3px 3px 0 var(--shadow); }
+.map-info { position: absolute; z-index: 2; bottom: 52px; left: 16px; max-width: calc(100% - 32px); padding: 8px 12px; background: var(--surface); pointer-events: none; }
+.map-info span { display: block; font-size: 16px; }
+#position { font-family: 'Share Tech Mono', monospace; }
+#load-status { color: var(--soft); }
+.map-attribution { position: absolute; z-index: 2; bottom: 0; left: 0; right: 0; padding: 8px 12px; background: var(--surface); color: var(--soft); font-size: 14px; cursor: auto; }
+#map-hint { margin: 12px 0 0; color: var(--soft); font-size: 16px; }
+@media (max-width: 680px) {
+  .map-header { gap: 12px; padding: 8px 12px; flex-wrap: wrap; }
+  .brand-logo { width: 42px; height: 42px; }
+  h1 { font-size: 18px; }
+  .theme-switch button { padding: 0 12px; }
+  .back-link { width: 100%; padding: 0; }
+  main { padding: 16px 12px 8px; }
+  #map { height: calc(100svh - 200px); }
+  .map-info { bottom: 74px; left: 10px; }
+  #placement-banner { flex-wrap: wrap; gap: 8px; }
+}
+/* The embedded map uses the workbench's branding, language and theme controls. */
+html[data-embedded='true'], html[data-embedded='true'] body { height: 100%; }
+html[data-embedded='true'] body { background: var(--map-bg); }
+html[data-embedded='true'] :is(.map-header, #map-hint) { display: none; }
+html[data-embedded='true'] main { height: 100%; padding: 0; }
+html[data-embedded='true'] #map { height: 100%; min-height: 0; border: 0; box-shadow: none; }
+@media (prefers-reduced-motion: reduce) { .image-loader-signal i { animation: none; } }

@@ -2,7 +2,7 @@
 
 Versión reducida de `cyber-manager`: una única página en español e inglés con las herramientas del DM y los generadores aleatorios. Conserva el logotipo y la estética cyberpunk de Magnus Laser.
 
-La dirección visual se inspira en Edgerunners: amarillo ácido para la navegación activa, superficies de negro tinta, señales cian y magenta, cortes diagonales y sombras marcadas. Se aplica a la cabecera, sesiones, oráculo, archivos, herramientas, referencias y registro. Conserva las fuentes Orbitron/Rajdhani, el logo original, su naranja y los fondos de ciudad; el CRT es más sutil y el glitch aparece brevemente al interactuar. El modo lectura comparte todos los componentes con una paleta de papel cálido y tintas oscuras.
+La dirección visual se inspira en Edgerunners: la navegación activa conserva el color de cada sección (lima para la mesa, cian para generadores, magenta para referencias y naranja para el mapa), superficies de negro tinta, señales cian y magenta, cortes diagonales y sombras marcadas. Se aplica a la cabecera, sesiones, oráculo, archivos, herramientas, referencias y registro. Conserva las fuentes Orbitron/Rajdhani, el logo original, su naranja y los fondos de ciudad; el CRT es más sutil y el glitch aparece brevemente al interactuar. El modo lectura comparte todos los componentes con una paleta de papel cálido y tintas oscuras.
 
 ## Uso local
 
@@ -13,11 +13,13 @@ npm ci
 npm run dev
 ```
 
-Abre la dirección que indique el servidor. La página tiene tres secciones: Mesa del DM, Generadores y Tablas de referencia. Las herramientas de sesión se cambian dentro de la misma página.
+Abre la dirección que indique el servidor. La página tiene cuatro secciones: Mesa del DM, Generadores, Tablas de referencia y Mapa de Night City. Las herramientas de sesión se cambian dentro de la misma página.
 
 La pantalla empieza directamente con el selector de sesiones y las herramientas, sin footer. La barra superior muestra el logo original sin enlace ni nombre repetido a su lado, el selector ES/EN y el cambio Chrome/Flesh para los modos cyberpunk y lectura. Los acentos de Magnus Laser usan el naranja del láser; la página y sus paneles tienen scrollbars personalizados en ambos temas.
 
-Los directorios principales y los botones de sesión y favoritos usan bordes angulares, barridos de luz y selección iluminada, adaptados de los controles originales de `cyber-manager`. Los desplegables comparten un menú propio, con la flecha junto al valor, navegación por teclado y búsqueda al escribir.
+El mapa se presenta como Night City **circa 2080**. El mapa y el fondo muestran loaders durante la carga y decodificación de sus imágenes, sin bloquear los controles. El fondo conserva el mismo encuadre y los filtros de color sobre un `picture` nativo, con las variantes Chrome/Flesh y escritorio/móvil; al cambiar de tema o de variante de pantalla se sigue la carga de la nueva imagen. Los loaders respetan el idioma y el movimiento reducido, y dejan de animarse si falla una imagen.
+
+Los directorios principales y los botones de sesión y favoritos usan superficies por categoría, cortes angulares, barridos de luz y selección iluminada, adaptados de los controles originales de `cyber-manager`. El color ocupa fondos, texto y controles cuando comunica una categoría o estado; los elementos neutros prescinden de bordes decorativos y no se repiten franjas izquierdas. Se conservan los contornos de campos y el foco de teclado. Los desplegables comparten un menú propio, con la flecha junto al valor, navegación por teclado y búsqueda al escribir.
 
 El selector de idioma presenta dos puertos de traducción, ES/Español y EN/English, unidos por una señal animada; conserva sus bordes completos y un diseño distinto de Chrome/Flesh. Las nueve herramientas del DM reutilizan los mismos stacks de archivos, con solapamiento, extracción, arrastre y swipe: naranja para Operaciones, magenta para Preparación y verde para Registros. La herramienta se abre debajo de su categoría y se cierra desde el archivo, con su botón de cierre o con Escape, devolviendo el foco. El panel activo y sus acciones siguen el color del grupo. Los campos, desplegables y acciones de formulario comparten una altura de 48 px y se alinean por su borde inferior.
 
@@ -57,7 +59,7 @@ Las pestañas mantienen su sesión activa al recibir cambios de otra pestaña y 
 
 El idioma se guarda de forma independiente con la clave `magnus-dm.language`. Cambiarlo no modifica la sesión ni sus identificadores y también se sincroniza entre pestañas.
 
-Los últimos 200 resultados se conservan, además de todos los fijados. La aplicación detecta almacenamiento inaccesible, agotado o corrupto y muestra un aviso. Los generadores funcionan localmente, sin API de IA ni claves. Las seis fichas completas son generadores procedurales; sus estadísticas y detalles editables sirven como punto de partida para el DM.
+Los últimos 200 resultados se conservan, además de todos los fijados y de las entradas con marcador en el mapa. La aplicación detecta almacenamiento inaccesible, agotado o corrupto y muestra un aviso. Los generadores funcionan localmente, sin API de IA ni claves. Las seis fichas completas son generadores procedurales; sus estadísticas y detalles editables sirven como punto de partida para el DM.
 
 Regenerar desde el registro o desde el resultado abierto reemplaza esa entrada, manteniendo su identificador, fecha, posición y estado de fijado. Generar desde una tarjeta sigue creando un resultado nuevo. El panel de registro tiene una sola zona de scroll, que incluye toda su superficie; los textos de las entradas se muestran completos, sin scrolls anidados, y al llegar al límite se puede seguir desplazando la página.
 
@@ -70,7 +72,7 @@ npm run build
 npm run test:render
 ```
 
-Las pruebas verifican generadores y traducciones, referencias, búsqueda combinada sin tildes, favoritos, fórmulas, límites del oráculo, relojes, probabilidades ponderadas, conservación del estado y HTML de producción. No sustituyen una prueba manual completa de la interfaz en navegador.
+Las pruebas verifican generadores y traducciones, referencias, búsqueda combinada sin tildes, favoritos, fórmulas, límites del oráculo, relojes, probabilidades ponderadas, conservación del estado, eventos de marcadores vinculados al registro y HTML de producción. No sustituyen una prueba manual completa de la interfaz en navegador.
 
 ## Estructura
 
@@ -96,16 +98,18 @@ Las pruebas verifican generadores y traducciones, referencias, búsqueda combina
 - `app/locale.tsx`, `lib/i18n.ts` y `lib/data/*-en.json`: preferencia de idioma, traducciones y datos originales ingleses.
 - `app/fonts.css` y `public/fonts/`: Orbitron, Rajdhani y Share Tech Mono servidas localmente, con sus licencias.
 
-Se han excluido mapas, simuladores 2D/3D, multijugador, Tauri, GraphQL, gestión de personajes jugadores y servicios de generación por IA. El despliegue usa la estructura de Sites/Vinext y no declara almacenamiento remoto.
+El mapa 2077 se abre desde «Mapa de Night City», la cuarta sección de la mesa, junto a Generadores y Tablas de referencia. Reutiliza el visor local y sigue el idioma ES/EN y el modo Chrome/Flesh de la aplicación, conservando zoom y posición al cambiar de aspecto o sección. Arrastrar una entrada del registro al mapa crea un marcador; pulsarlo permite editar título y contenido de la misma entrada. El botón de mapa de cada entrada permite colocarlo también con toque o teclado. Los marcadores se guardan por sesión; volver a arrastrar mueve el marcador y quitarlo conserva la entrada. Se han excluido simuladores 2D/3D, multijugador, Tauri, GraphQL, gestión de personajes jugadores y servicios de generación por IA. El despliegue usa la estructura de Sites/Vinext y no declara almacenamiento remoto.
 
 ## Recursos
 
 Las tablas en español e inglés, los colores y los logotipos proceden de `../cyber-manager/client/Magnus-Laser`. No se ha modificado el proyecto original.
 
-`public/og.png` es la tarjeta de presentación para compartir enlaces, creada con la herramienta integrada ImageGen. El prompt utilizado se conserva en `docs/social-card-prompt.txt`.
+`public/og.png` es la tarjeta de presentación para compartir enlaces, creada con la herramienta integrada ImageGen. Reutiliza la ciudad del fondo oscuro y el logo original en cian y naranja, con el lema «Tu mesa. Tus reglas.»; conserva el contorno hueco del emblema del cartel. Los metadatos Open Graph declaran su tamaño de 1730 × 909 px. El prompt utilizado se conserva en `docs/social-card-prompt.txt`.
 
 `public/magnus-city.webp` y `public/magnus-city-mobile.webp` son el nuevo fondo de página generado con ImageGen a partir del logo real y la dirección artística de la tarjeta anterior, sin textos promocionales. El prompt está en `docs/background-prompt.txt`. Las versiones WebP se optimizan localmente con Sharp. La cabecera utiliza directamente `public/magnus-laser.png`, el original de 1024 × 1024, en ambos temas; el modo lectura ajusta su color con CSS, sin sustituirlo por miniaturas ni reinterpretar el emblema.
 
 El modo lectura utiliza `public/magnus-city-reader-v2.webp` y su variante móvil `public/magnus-city-reader-mobile-v2.webp`. El emblema del cartel mantiene el contorno hueco del fondo oscuro. Son variantes claras creadas con ImageGen; los prompts están en `docs/reader-assets-prompts.txt` y `docs/reader-outline-correction.txt`.
+
+El mapa 2077 reutiliza el origen de Night City Navigator empleado por `cyber-manager`. Los 114.056 tiles de los zooms 11–19 se guardan localmente, sin modificar, en `public/maps/night-city-2077/reading/`, incluidos los niveles de detalle 18 y 19. El script `scripts/download-night-city-tiles.mjs` descarga, reanuda y verifica la cobertura; el inventario incluye hashes y atribución. El visor `/maps/night-city-2077/preview.html` permite revisar la versión original para Flesh y una paleta oscura para Chrome, conservando posición, calles y rótulos. `app/night-city-map.tsx` lo incorpora a la mesa sin duplicar la cabecera ni los controles de aspecto. El editor de marcadores comparte colores, acciones angulares y tipografía con la aplicación. Los límites, licencia y comandos están en `docs/night-city-map.md`.
 
 Los cambios se revisan en local. Publicar o actualizar el sitio requiere aprobación explícita del usuario; las modificaciones locales no actualizan la versión publicada.

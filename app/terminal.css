@@ -44,7 +44,7 @@
 .brand:hover .brand-wordmark { animation: original-button-glitch .4s steps(2) 2; }
 .site-header .brand small { font-size: 14px; letter-spacing: .23em; color: #a5c5d6; }
 .brand small b { color: #ff6533; margin-inline: 4px; }
-.header-channel { display: flex; align-items: center; gap: 12px; padding-left: 26px; border-left: 1px solid #00ffff35; color: var(--cyan); font: 14px var(--mono); letter-spacing: .12em; }
+.header-channel { display: flex; align-items: center; gap: 12px; padding-left: 0; border: 0; color: var(--cyan); font: 14px var(--mono); letter-spacing: .12em; }
 .header-channel small { display: block; font-size: 14px; color: var(--muted); margin-top: 5px; }
 .signal-bars { display: flex; align-items: end; gap: 3px; height: 24px; }
 .signal-bars i { width: 3px; height: 6px; background: #00ffff; box-shadow: 0 0 7px #00ffff90; }

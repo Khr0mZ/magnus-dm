@@ -12,7 +12,7 @@
 .stack-explorer .search-field input { padding-block: 6px; }
 .stack-explorer .outline-button { padding: 7px 10px; }
 .category-routing { flex: 0 1 275px; min-width: 0; }
-.router-trigger { position: relative; display: flex; align-items: center; gap: 9px; min-height: 42px; padding: 7px 10px; list-style: none; cursor: pointer; color: var(--category-ink); border: 1px solid color-mix(in srgb, var(--category-ink) 65%, transparent); border-left: 3px solid var(--category-ink); background: var(--panel); transition: box-shadow .2s, background .2s; }
+.router-trigger { position: relative; display: flex; align-items: center; gap: 9px; min-height: 42px; padding: 7px 10px; list-style: none; cursor: pointer; color: var(--category-ink); border: 1px solid color-mix(in srgb, var(--category-ink) 65%, transparent); background: var(--panel); transition: box-shadow .2s, background .2s; }
 .router-trigger::-webkit-details-marker { display: none; }
 .router-trigger > svg { flex-shrink: 0; }
 .router-trigger:after { content: ''; position: absolute; bottom: -1px; left: 0; width: 24px; height: 2px; background: var(--category-ink); box-shadow: 0 0 8px currentColor; transition: width .3s cubic-bezier(.2,.8,.2,1); }
@@ -26,7 +26,7 @@
 .router-trigger:hover:after, .category-routing[open] .router-trigger:after { width: 100%; }
 .directory-matrix { position: absolute; left: 0; top: calc(100% - 1px); z-index: 40; width: min(720px, 100%); max-height: min(380px, 55dvh); overflow-y: auto; overflow-x: hidden; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(210px, 100%), 1fr)); gap: 6px; padding: 10px; border: 1px solid var(--category-ink); background: var(--bg); box-shadow: 0 14px 30px color-mix(in srgb, var(--bg) 85%, transparent), inset 0 2px var(--category-ink); animation: directory-connect .22s ease-out; }
 .category-routing:not([open]) .directory-matrix { display: none; }
-.directory-port { position: relative; isolation: isolate; display: grid; grid-template-columns: auto 20px minmax(0, 1fr) auto; align-items: center; gap: 7px; min-height: 44px; padding: 8px; text-align: left; color: var(--category-ink); border-left: 2px solid var(--category-ink); background: var(--panel); transition: transform .2s, background .2s, box-shadow .2s; }
+.directory-port { position: relative; isolation: isolate; display: grid; grid-template-columns: auto 20px minmax(0, 1fr) auto; align-items: center; gap: 7px; min-height: 44px; padding: 8px; text-align: left; color: var(--category-ink); background: var(--panel); transition: transform .2s, background .2s, box-shadow .2s; }
 .directory-port:after { content: ''; position: absolute; left: 0; bottom: 0; width: 0; height: 1px; background: currentColor; box-shadow: 0 0 5px currentColor; transition: width .25s; }
 .port-address { font: 14px/1 var(--mono); opacity: .6; }
 .port-folder { display: flex; align-items: center; transition: transform .2s; }
@@ -70,7 +70,7 @@
 .application .stack-file-open {
   display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr; align-items: center; gap: 8px;
   position: relative; isolation: isolate; overflow: hidden; width: 100%; height: 100%; min-height: 132px; padding: 12px calc(var(--file-overlap) + 12px) 12px 12px;
-  text-align: left; color: var(--category-ink); border: 0; border-left: 3px solid var(--category-ink); border-radius: 0;
+  text-align: left; color: var(--category-ink); border: 0; border-radius: 0;
   background: linear-gradient(150deg, color-mix(in srgb, var(--category-ink) 18%, var(--panel)), var(--panel) 80%);
   box-shadow: inset 0 1px var(--category-ink), inset 0 -1px color-mix(in srgb, var(--category-ink) 50%, transparent);
   clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 9px 100%, 0 calc(100% - 9px));
@@ -109,7 +109,7 @@ button:hover > .favorite-mark, button:focus-visible > .favorite-mark { color: va
 .stack-files:not(:has(> .is-hovered)) > .stack-slot:has(:focus-visible) .stack-file-open:after { animation: shard-scan .5s ease-out; }
 .stack-file-open:active { filter: brightness(1.2); }
 .application .stack-file-open:focus-visible { outline: 2px solid var(--category-ink); outline-offset: -5px; }
-.reference-document { margin: 13px 2px 8px; min-width: 0; border: 1px solid var(--category-ink); border-left-width: 3px; background: var(--panel); box-shadow: 0 0 22px color-mix(in srgb, var(--category-ink) 10%, transparent); animation: shard-extract .23s ease-out; }
+.reference-document { margin: 13px 2px 8px; min-width: 0; border: 1px solid var(--category-ink); background: var(--panel); box-shadow: 0 0 22px color-mix(in srgb, var(--category-ink) 10%, transparent); animation: shard-extract .23s ease-out; }
 .document-heading { display: flex; align-items: center; gap: 10px; padding: 12px 14px; color: var(--category-ink); border-bottom: 1px solid color-mix(in srgb, var(--category-ink) 40%, transparent); background: color-mix(in srgb, var(--category-ink) 10%, transparent); }
 .document-heading h4 { font-size: 15px; line-height: 1.65; flex: 1; }
 .document-heading .icon-button { color: var(--category-ink); width: 44px; height: 44px; }

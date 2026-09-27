@@ -3,20 +3,39 @@ import test from 'node:test';
 import { build } from 'vite';
 import { fileURLToPath } from 'node:url';
 
-await build({ configFile: false, logLevel: 'silent', build: { outDir: 'work/locale-tests', emptyOutDir: true, minify: false, lib: { entry: fileURLToPath(new URL('./locale-entry.tsx', import.meta.url)), formats: ['es'], fileName: () => 'ui.mjs' }, rollupOptions: { external: ['react', 'react-dom/server', 'react/jsx-runtime'] } } });
-const { renderWorkbench, renderExplorer, renderReferenceDocument, renderFavoriteReferences, catalogSizes } = await import('../work/locale-tests/ui.mjs');
+await build({ configFile: false, publicDir: false, logLevel: 'silent', build: { outDir: 'work/locale-tests', emptyOutDir: true, minify: false, lib: { entry: fileURLToPath(new URL('./locale-entry.tsx', import.meta.url)), formats: ['es'], fileName: () => 'ui.mjs' }, rollupOptions: { external: ['react', 'react-dom/server', 'react/jsx-runtime'] } } });
+const { renderWorkbench, renderExplorer, renderReferenceDocument, renderFavoriteReferences, renderMapEditor, catalogSizes } = await import('../work/locale-tests/ui.mjs');
+
+test('the linked marker editor localizes controls and displays the saved coordinates and content', () => {
+  const es = renderMapEditor('es'), en = renderMapEditor('en');
+  for (const label of ['Editar marcador', 'Cerrar editor', 'Entrada vinculada al registro', 'Guardar cambios', 'Quitar marcador', 'Cancelar']) assert.ok(es.includes(label), label);
+  for (const label of ['Edit marker', 'Close editor', 'Linked log entry', 'Save changes', 'Remove marker', 'Cancel']) assert.ok(en.includes(label), label);
+  for (const html of [es, en]) {
+    assert.match(html, /Zero \/ Afterlife/);
+    assert.match(html, /Nueva pista/);
+    assert.match(html, /0.03000/);
+    assert.match(html, /-0.04000/);
+    assert.match(html, /aria-labelledby="map-entry-heading"/);
+  }
+  assert.doesNotMatch(en, /Editar marcador|Entrada vinculada|Cerrar editor/);
+  assert.match(es + en, /NIGHT CITY \/ circa 2080/);
+});
 
 test('the workbench renders both languages with the correct switch selection', () => {
   const spanish = renderWorkbench('es');
   const english = renderWorkbench('en');
-  for (const text of ['Nueva sesión', 'Cambiar de sesión', 'Nombre de la sesión', 'Mesa del DM', 'Notas de sesión', 'Crear reloj']) assert.ok(spanish.includes(text), text);
-  for (const text of ['New session', 'Switch session', 'Session name', 'DM Workbench', 'Session notes', 'Create clock', 'Contact / NPC', 'Mission builder']) assert.ok(english.includes(text), text);
+  for (const text of ['Nueva sesión', 'Cambiar de sesión', 'Nombre de la sesión', 'Mesa del DM', 'Notas de sesión', 'Crear reloj', 'Mapa de Night City']) assert.ok(spanish.includes(text), text);
+  for (const text of ['New session', 'Switch session', 'Session name', 'DM Workbench', 'Session notes', 'Create clock', 'Contact / NPC', 'Mission builder', 'Night City map']) assert.ok(english.includes(text), text);
   assert.match(spanish, /lang="es" aria-label="Español" aria-pressed="true"/);
   assert.match(english, /lang="en" aria-label="English" aria-pressed="true"/);
   assert.doesNotMatch(english, /Lanzador de dados|Crear reloj|Herramientas de dirección|Recuperando|GUARDADO/);
   assert.doesNotMatch(spanish + english, /dice-panel|<footer|<a class="brand"|matrix-rain|hero-poster|terminal-hero|YOUR TABLE\.|TU MESA\.|save-indicator|>Renombrar<|>Rename</);
   assert.match(spanish, /NIGHT CITY \/ 2080/);
   assert.match(english, /NIGHT CITY \/ 2080/);
+  assert.match(spanish, /circa 2080/);
+  assert.match(english, /circa 2080/);
+  assert.match(spanish, /Cargando fondo…/);
+  assert.match(english, /Loading background…/);
   assert.doesNotMatch(spanish + english, /NIGHT CITY \/ 2045/);
   assert.equal([...spanish.matchAll(/aria-label="Abrir herramienta:/g)].length, 9);
   assert.equal([...english.matchAll(/aria-label="Open tool:/g)].length, 9);
