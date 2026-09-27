@@ -17,6 +17,7 @@ import { FileStack, StackFile } from './data-stack';
 import GeneratorExplorer from './generator-explorer';
 import ReferenceExplorer, { FavoriteReferences } from './reference-explorer';
 import { copyText } from '../lib/clipboard';
+import { assetPath } from '../lib/asset-path';
 import SessionBar from './session-bar';
 import CyberSelect from './cyber-select';
 import OraclePanel from './oracle-panel';
@@ -114,7 +115,7 @@ function SessionWorkbench({ store }: { store: ReturnType<typeof useSession> }) {
     <a className="skip-link" href="#workspace">{t("Saltar a las herramientas")}</a>
     <header className="site-header">
       <div className="header-branding">
-        <div className="brand"><img src="/magnus-laser.png" alt="Magnus Laser" width="64" height="64" /></div>
+        <div className="brand"><img src={assetPath('/magnus-laser.png')} alt="Magnus Laser" width="64" height="64" /></div>
         <div className="header-channel"><span className="signal-bars" aria-hidden="true"><i/><i/><i/><i/></span><span>{t("CANAL DEL DM")}<small>NIGHT CITY / 2080</small></span></div>
       </div>
       <SessionBar {...store} />

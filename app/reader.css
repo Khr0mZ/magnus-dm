@@ -21,9 +21,6 @@
   color-scheme: light;
 }
 
-.reader-mode .cyber-background {
-  background-image: linear-gradient(90deg, #f6f5ee30, #f6f5ee12 65%, #f6f5ee15), url('/magnus-city-reader-v2.webp');
-}
 .reader-mode .crt-overlay {
   background-image: repeating-linear-gradient(0deg, transparent 0 2px, #155b6707 2px 3px, #1e343c16 3px 4px);
 }
@@ -36,8 +33,6 @@
 /* Both themes use the original 1024px artwork; reading mode adjusts ink only. */
 .reader-mode .site-header { background-image: linear-gradient(100deg, #f6f5eef5, #edf1ebe8 60%, #f6f5eeeb); border-color: var(--cyan); }
 .reader-mode .site-header .brand img { filter: brightness(.48) saturate(1.15); }
-.reader-mode .brand-wordmark { color: var(--cyan); }
-.reader-mode .brand-wordmark > span { color: var(--orange); }
 .reader-mode .site-header .brand small, .reader-mode .header-channel small { color: var(--soft); }
 .reader-mode .brand small b { color: var(--orange); }
 .reader-mode .header-channel { color: var(--cyan); border-color: var(--border); }
@@ -53,18 +48,9 @@
 .reader-mode .language-switch button { color: var(--soft); }
 .reader-mode .language-switch button[aria-pressed=true] { color: var(--cyan); background: #155b6712; }
 .reader-mode .language-switch button:hover { color: var(--pink); }
-.reader-mode .site-header .theme-button { border-color: var(--pink); color: var(--pink); }
-.reader-mode .hero.terminal-hero h1 { color: var(--text); }
-.reader-mode .hero.terminal-hero .hero-copy > p,
-.reader-mode .hero.terminal-hero .eyebrow { color: var(--soft); }
-.reader-mode .terminal-hero .cursor-block { background: var(--orange); }
-.reader-mode .hero-stats { border-color: var(--border); }
-.reader-mode .hero-link { color: var(--cyan); background: #155b670a; border-color: var(--cyan); }
-.reader-mode .hero-link:hover { color: var(--text); background: #155b6720; }
 
 /* Recolor only surfaces that already exist in the dark theme. */
-.reader-mode .panel, .reader-mode .history-panel, .reader-mode .notes-panel,
-.reader-mode .tool-workspace, .reader-mode .generator-card, .reader-mode .reference-table {
+.reader-mode .panel, .reader-mode .history-panel, .reader-mode .notes-panel, .reader-mode .tool-workspace {
   background-image: linear-gradient(#fffef9e8, #fffef9e8), repeating-linear-gradient(0deg, transparent 0 2px, #155b6709 2px 4px);
   border-color: var(--border);
 }
@@ -78,7 +64,6 @@
 }
 .reader-mode .oracle-panel { border-top-color: var(--pink); }
 .reader-mode .oracle-panel > .panel-heading { background-image: linear-gradient(180deg, #803c7010, transparent); border-color: #803c7040; }
-.reader-mode .dice-panel { border-top-color: var(--cyan); }
 .reader-mode .tool-workspace input, .reader-mode .tool-workspace textarea { border-color: var(--border); }
 .reader-mode select { color-scheme: light; background: var(--input); }
 .reader-mode input::placeholder, .reader-mode textarea::placeholder { color: var(--muted); }
@@ -91,21 +76,9 @@
 .reader-mode .main-tabs > button:hover { color: var(--cyan); background: #155b6710; }
 .reader-mode .main-tabs > button.active:after { background: var(--cyan); }
 .reader-mode .main-tabs small { color: var(--green); border-color: var(--border); }
-.reader-mode .dice-presets > button { color: var(--cyan); border-color: var(--border); }
-.reader-mode .dice-presets > button.selected, .reader-mode .dice-presets > button:hover { background: #155b6722; border-color: var(--cyan); }
 .reader-mode .segmented > button.selected { background: #803c7015; color: var(--pink); }
-.reader-mode .category-tabs button { color: var(--cyan); border-color: var(--border); }
-.reader-mode .category-tabs button.selected, .reader-mode .category-tabs button:hover { background: #155b6715; border-color: var(--cyan); }
 
 /* Each generator retains its own hue, mixed into a legible ink color. */
-.reader-mode .generator-card {
-  --accent: color-mix(in srgb, var(--generator-color, #00ffff) 35%, #18303a);
-  border-color: color-mix(in srgb, var(--accent) 45%, var(--panel));
-}
-.reader-mode .generator-card:hover { background-color: #e0efed; border-color: var(--accent); }
-.reader-mode .generator-card:after { background: var(--bg); border-color: var(--accent); }
-.reader-mode .generator-trigger p { color: var(--soft); }
-.reader-mode .generator-trigger > span { border-color: color-mix(in srgb, var(--accent) 30%, var(--panel)); }
 .reader-mode .tool-selector > button.selected { color: var(--cyan); background: #155b6715; border-color: var(--cyan); }
 .reader-mode .tool-selector > button:hover { border-color: var(--cyan); }
 .reader-mode .generated-result { border-color: #7b9d86; border-left-color: var(--green); }
@@ -118,15 +91,7 @@
 .reader-mode .history-entry:last-child { border-color: var(--border); }
 .reader-mode .history-entry.pinned { border-color: var(--green); }
 .reader-mode .count-badge { color: var(--green); border-color: #9bb3a1; }
-.reader-mode .quote-bars { background: repeating-linear-gradient(90deg, var(--pink) 0 2px, transparent 2px 5px, var(--cyan) 5px 6px, transparent 6px 10px); }
 .reader-mode .table-scroll th { background: #e5eeea; color: var(--cyan); }
 .reader-mode .table-scroll tr.highlight td { background: #eaf0e1; }
 .reader-mode .toast { background: var(--panel); color: var(--text); border-color: var(--cyan); }
 .reader-mode .error-banner { background: #fff0e9; color: var(--orange); }
-.reader-mode .site-footer { border-color: var(--border); }
-
-@media (max-width: 600px) {
-  .reader-mode .cyber-background {
-    background-image: linear-gradient(90deg, #f6f5ee88, #f6f5ee44), url('/magnus-city-reader-mobile-v2.webp');
-  }
-}

@@ -1,6 +1,6 @@
-@font-face { font-family: Orbitron; src: url('/fonts/orbitron-600.ttf') format('truetype'); font-weight: 600; font-display: swap; }
-@font-face { font-family: Rajdhani; src: url('/fonts/rajdhani-500.ttf') format('truetype'); font-weight: 500; font-display: swap; }
-@font-face { font-family: 'Share Tech Mono'; src: url('/fonts/share-tech-mono-400.ttf') format('truetype'); font-display: swap; }
+@font-face { font-family: Orbitron; src: url('../../fonts/orbitron-600.ttf') format('truetype'); font-weight: 600; font-display: swap; }
+@font-face { font-family: Rajdhani; src: url('../../fonts/rajdhani-500.ttf') format('truetype'); font-weight: 500; font-display: swap; }
+@font-face { font-family: 'Share Tech Mono'; src: url('../../fonts/share-tech-mono-400.ttf') format('truetype'); font-display: swap; }
 :root {
   color-scheme: dark;
   --bg: #090c10;
@@ -13,7 +13,7 @@
   --acid: #edfa35;
   --pink: #ff74cc;
   --shadow: #03050799;
-  --artwork: url('/magnus-city.webp');
+  --artwork: url('../../magnus-city.webp');
   --map-bg: var(--surface);
   /* Lower the inverted beige below the ink surface, then lift each channel
      to that surface with lighten blending. Keep the colored map details. */
@@ -32,7 +32,7 @@
   --acid: #dfed33;
   --pink: #9b236a;
   --shadow: #28332b26;
-  --artwork: url('/magnus-city-reader-v2.webp');
+  --artwork: url('../../magnus-city-reader-v2.webp');
   --map-bg: #f2efe9;
   --map-filter: none;
   --map-blend: normal;

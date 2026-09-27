@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { headers } from 'next/headers';
+import { assetPath } from '../lib/asset-path';
 import "./globals.css";
 import './fonts.css';
 import './cyberpunk.css';
@@ -16,18 +16,17 @@ const siteMetadata: Metadata = {
   title: "Magnus Laser — Mesa del DM",
   description: "Tu mesa. Tus reglas. Herramientas de dirección de partida y generadores aleatorios cyberpunk, en una sola pantalla.",
   icons: {
-    icon: "/favicon.png",
-    shortcut: "/favicon.png",
+    icon: assetPath('/favicon.png'),
+    shortcut: assetPath('/favicon.png'),
   },
 };
 
-export async function generateMetadata(): Promise<Metadata> {
-  const requestHeaders = await headers();
-  const host = requestHeaders.get('host') || 'localhost:3000';
-  const protocol = host.startsWith('localhost') || host.startsWith('127.0.0.1') ? 'http' : 'https';
-  const image = `${protocol}://${host}/og.png`;
+export function generateMetadata(): Metadata {
+  const siteUrl = new URL(process.env.MAGNUS_SITE_URL || 'https://khr0mz.github.io/magnus-dm/');
+  const image = new URL('og.png', siteUrl).href;
   return {
     ...siteMetadata,
+    metadataBase: siteUrl,
     openGraph: {
       title: 'Magnus Laser — Tu mesa. Tus reglas.',
       description: siteMetadata.description!,

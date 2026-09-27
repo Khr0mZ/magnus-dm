@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { validMapLocation, type Entry, type MapLocation } from '../lib/session';
 import { useLocale } from './locale';
 import ImageLoader from './image-loader';
+import { assetPath } from '../lib/asset-path';
 
 export const ENTRY_DRAG_TYPE = 'application/x-magnus-session-entry';
 
@@ -19,7 +20,7 @@ export default function NightCityMap({ reader, hidden, enabled, sessionId, entri
   const frame = useRef<HTMLIFrameElement>(null);
   const [frameReady, setFrameReady] = useState(false);
   // Keep one document alive so theme/language changes preserve zoom and position.
-  const [source] = useState(() => `/maps/night-city-2077/preview.html?embed=1&theme=${reader ? 'flesh' : 'chrome'}&lang=${language}`);
+  const [source] = useState(() => `${assetPath('/maps/night-city-2077/preview.html')}?embed=1&theme=${reader ? 'flesh' : 'chrome'}&lang=${language}`);
   const syncPreferences = useCallback(() => {
     frame.current?.contentWindow?.postMessage({
       type: 'magnus:map-preferences', theme: reader ? 'flesh' : 'chrome', language,

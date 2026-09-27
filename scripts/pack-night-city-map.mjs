@@ -58,7 +58,7 @@ export async function packMapAssets(directory) {
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  const directory = fileURLToPath(new URL('../dist/client/maps/night-city-2077/', import.meta.url));
+  const directory = fileURLToPath(new URL('../out/maps/night-city-2077/', import.meta.url));
   const result = await packMapAssets(directory);
   console.log(`Map assets: ${result.coordinates} coordinates preserved in ${result.images} unique images.`);
 }

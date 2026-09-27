@@ -2,6 +2,7 @@
 /* The native picture loads the same branded artwork with observable events. */
 import { memo, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { observeImageLoading, type ImageLoadStatus } from '../lib/image-loading';
+import { assetPath } from '../lib/asset-path';
 import { useLocale } from './locale';
 import ImageLoader from './image-loader';
 
@@ -18,8 +19,8 @@ function BackgroundArtwork({ reader }: { reader: boolean }) {
   const { t } = useLocale();
   const [status, setStatus] = useState<ImageLoadStatus>('loading');
   const imageRef = useRef<HTMLImageElement>(null);
-  const desktop = reader ? '/magnus-city-reader-v2.webp' : '/magnus-city.webp';
-  const mobile = reader ? '/magnus-city-reader-mobile-v2.webp' : '/magnus-city-mobile.webp';
+  const desktop = assetPath(reader ? '/magnus-city-reader-v2.webp' : '/magnus-city.webp');
+  const mobile = assetPath(reader ? '/magnus-city-reader-mobile-v2.webp' : '/magnus-city-mobile.webp');
   useEffect(() => {
     const image = imageRef.current;
     if (image) return observeImageLoading(image, setStatus);
