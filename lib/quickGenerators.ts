@@ -1,0 +1,11 @@
+import * as t from './soloPlayTables';
+const pick = t.getRandomFromArray;
+export const generateQuickNPC = () => ({ occupation: pick(t.npcOccupationTable()), mood: pick(t.npcMoodTable()), motivation: pick(t.npcMotivationTable()), appearance: pick(t.npcAppearanceTable()) });
+export const generateQuickLocation = () => ({ type: pick(t.locationTypeTable()), descriptor: pick(t.detailFocusTable()), event: pick(t.eventTable()) });
+export const generateQuickEvent = () => pick(t.eventTable());
+export const generateQuickComplication = () => pick(t.complicationTable());
+export const generateQuickRumor = () => pick(t.rumorTable());
+export const generateQuickClue = () => `${pick(t.detailFocusTable())} ${pick(t.clueTypeTable()).toLowerCase()}`;
+export const generateQuickTwist = () => { const r = pick(t.twistTable()); return `${r.twist}: ${r.notes}`; };
+export const generateQuickMotivation = () => pick(t.npcMotivationTable());
+export const generateQuickMood = () => pick(t.npcMoodTable());

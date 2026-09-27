@@ -1,0 +1,39 @@
+export type Entry = { id: string; title: string; text: string; kind: string; time: number; pinned: boolean; generator?: string };
+export type Clock = { id: string; name: string; initial: number; remaining: number; escalate: boolean; rolls: number[]; luckUsed: boolean };
+export type NPC = { id: string; name: string; role: string; status: string; relationship: string; notes: string; stats: string };
+export type Scene = { id: string; name: string; location: string; participants: string; goal: string; outcome: string; done: boolean };
+export type Beat = { id: string; kind: string; text: string; done: boolean };
+export type Challenge = { id: string; kind: 'investigation' | 'social'; name: string; target: number; base: number; difficulty: number; checks: { total: number; detail: string; win: boolean }[] };
+export type IP = { id: string; name: string; amount: number; note: string; date: string };
+export type CustomTable = { id: string; name: string; items: { text: string; weight: number }[] };
+export type Session = { version: 1; name: string; notes: string; history: Entry[]; clocks: Clock[]; npcs: NPC[]; scenes: Scene[]; beats: Beat[]; challenges: Challenge[]; ip: IP[]; customTables: CustomTable[]; mission: Record<string, string> | null; favorites: string[]; reader: boolean };
+export function emptySession(): Session {
+  return { version: 1, name: 'Una noche en Night City', notes: '', history: [], clocks: [], npcs: [], scenes: [], beats: [], challenges: [], ip: [], customTables: [], mission: null, favorites: ['contactFull', 'gigFull', 'gangFull', 'buildingFull', 'bountyFull', 'itemFull'], reader: false };
+}
+const object = (v: unknown): v is Record<string, unknown> => !!v && typeof v === 'object' && !Array.isArray(v);
+const strings = (v: Record<string, unknown>, keys: string[]) => keys.every(key => typeof v[key] === 'string');
+const finite = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v);
+const integer = (v: unknown, min: number, max: number): v is number => finite(v) && Number.isInteger(v) && v >= min && v <= max;
+const list = (v: unknown, test: (v: Record<string, unknown>) => boolean): boolean => Array.isArray(v) && v.every(item => object(item) && test(item)) && new Set(v.map(item => item.id)).size === v.length;
+export function parseSession(raw: string): Session {
+  const v: unknown = JSON.parse(raw);
+  if (!object(v) || v.version !== 1 || !strings(v, ['name', 'notes']) || typeof v.reader !== 'boolean'
+    || !Array.isArray(v.favorites) || !v.favorites.every(x => typeof x === 'string')
+    || !(v.mission === null || (object(v.mission) && Object.values(v.mission).every(x => typeof x === 'string')))
+    || !list(v.history, x => strings(x, ['id', 'title', 'text', 'kind']) && finite(x.time) && typeof x.pinned === 'boolean' && (x.generator === undefined || typeof x.generator === 'string'))
+    || !list(v.clocks, x => strings(x, ['id', 'name']) && integer(x.initial, 3, 10) && integer(x.remaining, 0, x.initial as number) && typeof x.escalate === 'boolean' && typeof x.luckUsed === 'boolean' && Array.isArray(x.rolls) && x.rolls.every(r => integer(r, 1, 6)))
+    || !list(v.npcs, x => strings(x, ['id', 'name', 'role', 'status', 'relationship', 'notes', 'stats']))
+    || !list(v.scenes, x => strings(x, ['id', 'name', 'location', 'participants', 'goal', 'outcome']) && typeof x.done === 'boolean')
+    || !list(v.beats, x => strings(x, ['id', 'kind', 'text']) && typeof x.done === 'boolean')
+    || !list(v.challenges, x => strings(x, ['id', 'name']) && ['investigation', 'social'].includes(String(x.kind)) && [3, 5, 7].includes(Number(x.target)) && finite(x.base) && finite(x.difficulty) && Array.isArray(x.checks) && x.checks.length <= Number(x.target) && x.checks.every(c => object(c) && finite(c.total) && typeof c.detail === 'string' && typeof c.win === 'boolean'))
+    || !list(v.ip, x => strings(x, ['id', 'name', 'note', 'date']) && finite(x.amount))
+    || !list(v.customTables, x => strings(x, ['id', 'name']) && Array.isArray(x.items) && x.items.length >= 3 && x.items.length <= 20 && x.items.every(i => object(i) && typeof i.text === 'string' && finite(i.weight) && i.weight > 0))) {
+    throw new Error('No se ha podido leer la sesión guardada. Tus datos originales siguen en este navegador.');
+  }
+  return v as Session;
+}
+export function appendEntry(session: Session, entry: Entry): Session {
+  const history = [entry, ...session.history];
+  let recent = 0;
+  return { ...session, history: history.filter(item => item.pinned || ++recent <= 200) };
+}
