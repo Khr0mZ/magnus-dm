@@ -118,6 +118,7 @@ export function StackFile({ label, description, index, kind, selected = false, f
       <span className="file-stamp" aria-hidden="true"><span>{kind.toUpperCase()}</span><span>{String(index + 1).padStart(2, '0')}</span></span>
       <strong>{label}</strong>
     </button>
+    <span className="file-outline" aria-hidden="true"/>
     {onFavorite && <button className="shard-favorite" aria-label={t(favorite ? 'Quitar de favoritos: {name}' : 'Añadir a favoritos: {name}', { name: label })} aria-pressed={favorite} onClick={onFavorite}><FavoriteMark active={favorite}/></button>}
   </article>;
 }

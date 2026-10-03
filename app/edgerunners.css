@@ -127,6 +127,7 @@
 .edgerunners .site-header .session-combo-field input { font-size: 18px; }
 .edgerunners .site-header .session-actions { flex: 0 0 auto; flex-wrap: nowrap; width: auto; gap: 8px; }
 .edgerunners .site-header .session-action { flex: 0 0 auto; min-height: 48px; white-space: nowrap; }
+.edgerunners .site-header .session-action-icon { display: none; }
 .edgerunners .site-header .session-delete { width: 48px; height: 48px; border: 0; background: var(--input); }
 .edgerunners .site-header .session-delete:hover:enabled { color: var(--bg); background: var(--orange); }
 .edgerunners .site-header .session-editor {
@@ -182,6 +183,9 @@
 }
 .edgerunners .mode-switch:hover { background: color-mix(in srgb, var(--pink) 24%, var(--input)); }
 .edgerunners .mode-switch i:after { box-shadow: none; }
+.edgerunners .oracle-mode-switch { min-width: 0; min-height: 48px; text-transform: uppercase; }
+.edgerunners .oracle-mode-switch > span { min-width: 0; overflow-wrap: anywhere; }
+.edgerunners .oracle-mode-switch i { flex-shrink: 0; }
 
 /* Root sections share terminal keys, with a solid live key. */
 .edgerunners .drive-nav { grid-template-columns: repeat(4, minmax(0, 1fr)); }
@@ -192,7 +196,6 @@
   border: 0;
   box-shadow: none;
   color: var(--soft);
-  clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
 }
 .edgerunners .drive-nav > button:nth-child(2) { --drive: var(--cyan); }
 .edgerunners .drive-nav > button:nth-child(3) { --drive: var(--pink); }
@@ -200,15 +203,14 @@
 .edgerunners .drive-nav > button:hover {
   color: var(--drive);
   background: color-mix(in srgb, var(--drive) 24%, var(--panel));
-  box-shadow: inset 0 1px var(--drive), inset 0 -3px var(--drive);
+  box-shadow: none;
 }
 .edgerunners .drive-nav > button.active {
   color: var(--on-drive);
   background: var(--drive);
-  box-shadow: inset 0 -4px var(--on-drive);
+  box-shadow: none;
   text-shadow: none;
 }
-.edgerunners .drive-nav > button:after { background: currentColor; box-shadow: none; height: 4px; }
 .edgerunners .drive-nav .drive-copy strong { font-weight: 800; letter-spacing: -.02em; }
 .edgerunners .drive-nav .drive-copy small { color: var(--soft); }
 .edgerunners .drive-nav > .active :is(.drive-icon, .drive-number, .drive-copy small, .drive-number small) { color: var(--on-drive); }
@@ -257,10 +259,8 @@
 .edgerunners .map-entry-editor textarea { min-height: 220px; resize: vertical; }
 .edgerunners .map-entry-editor :is(input, textarea) { width: 100%; padding: 12px 14px; font-size: 18px; line-height: 1.5; }
 .edgerunners .map-editor-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 4px; }
-.edgerunners .map-editor-actions .cyber-action { min-height: 48px; font-size: 14px; }
 .edgerunners .map-editor-save { --control-ink: var(--orange); flex: 1 1 auto; }
 .edgerunners .map-editor-unlink { --control-ink: var(--pink); }
-.edgerunners .map-editor-actions .outline-button { color: var(--soft); background: var(--panel-raised); }
 @keyframes map-editor-connect { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 .edgerunners .section-intro h2 {
   color: var(--text);
@@ -308,9 +308,8 @@
 .edgerunners .oracle-panel .panel-heading h2 { color: var(--text); text-shadow: none; }
 .edgerunners .oracle-panel .panel-heading h2 > span { background: var(--pink); color: var(--bg); }
 .edgerunners .empty-state { border-color: var(--border-soft); background: transparent; }
-.edgerunners .empty-cross { color: var(--yellow); text-shadow: none; }
 
-/* Angular controls, solid primary actions and crisp, local focus signals. */
+/* One shared action button, with category colors and the original hard cuts. */
 .edgerunners :is(.primary-button, .secondary-button, .outline-button, .danger-button, .cyber-action) {
   border-radius: 0;
   box-shadow: none;
@@ -318,40 +317,51 @@
   letter-spacing: .025em;
 }
 .edgerunners .cyber-action {
-  background: color-mix(in srgb, var(--control-ink) 16%, var(--input));
-  border: 0;
-  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
-}
-.edgerunners .cyber-action:after { height: 3px; }
-.edgerunners .cyber-action:is(:hover:enabled, :focus-visible) {
-  background: color-mix(in srgb, var(--control-ink) 14%, var(--input));
-  box-shadow: inset 0 -2px var(--control-ink);
-  text-shadow: none;
-}
-.edgerunners :is(.primary-button.cyber-action, .oracle-submit, .session-action:first-child),
-.edgerunners .cyber-action:is([aria-pressed=true], [aria-expanded=true]) {
   background: var(--control-ink);
   color: var(--bg);
-  border-color: var(--control-ink);
-  box-shadow: none;
+  border: 0;
 }
-.edgerunners :is(.primary-button.cyber-action, .oracle-submit, .session-action:first-child):is(:hover:enabled, :focus-visible),
-.edgerunners .cyber-action:is([aria-pressed=true], [aria-expanded=true]):is(:hover:enabled, :focus-visible) {
+.edgerunners .cyber-action,
+.edgerunners .drive-nav > button {
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+}
+.edgerunners .cyber-action:after,
+.edgerunners .drive-nav > button:after,
+.edgerunners .drive-nav > button.active:after { background: var(--bg); height: 3px; }
+.edgerunners .cyber-action:is(:hover:enabled, :focus-visible) {
   background: color-mix(in srgb, var(--control-ink) 86%, var(--text));
   color: var(--bg);
+  box-shadow: none;
   text-shadow: none;
 }
 .edgerunners .cyber-action:focus-visible { outline-color: currentColor; }
-.edgerunners .favorite-filter[aria-pressed=true] .favorite-mark { --panel: var(--control-ink); color: var(--bg); }
-.edgerunners :is(.primary-button, .secondary-button, .outline-button, .danger-button):not(.cyber-action) {
-  background: color-mix(in srgb, var(--button-neon) 16%, var(--input));
-  border: 0;
-  box-shadow: none;
+.edgerunners .cyber-action .favorite-mark { --panel: var(--control-ink); color: inherit; }
+/* Angular checkboxes share one appearance and retain native form behavior. */
+.edgerunners input[type=checkbox] {
+  --checkbox-ink: var(--tool-ink, var(--cyan));
+  -webkit-appearance: none; appearance: none; position: relative; flex-shrink: 0;
+  width: 20px; height: 20px; margin: 0; padding: 0; border: 0; border-radius: 0;
+  background: transparent; box-shadow: none; outline: none; color: var(--checkbox-ink); cursor: pointer;
 }
-.edgerunners :is(.primary-button, .secondary-button, .outline-button, .danger-button):not(.cyber-action):hover {
-  background: color-mix(in srgb, var(--button-neon) 12%, var(--input));
-  box-shadow: none;
+.edgerunners input[type=checkbox]:before {
+  content: ''; position: absolute; inset: 0; pointer-events: none; background: var(--muted);
+  clip-path: polygon(evenodd,
+    0 0, calc(100% - 4px) 0, 100% 4px, 100% 100%, 4px 100%, 0 calc(100% - 4px), 0 0,
+    1px 1px, calc(100% - 4px) 1px, calc(100% - 1px) 4px,
+    calc(100% - 1px) calc(100% - 1px), 4px calc(100% - 1px), 1px calc(100% - 4px), 1px 1px
+  );
+  transition: background .16s;
 }
+.edgerunners input[type=checkbox]:after {
+  content: ''; position: absolute; inset: 5px; pointer-events: none; background: currentColor;
+  clip-path: polygon(0 0, calc(100% - 2px) 0, 100% 2px, 100% 100%, 2px 100%, 0 calc(100% - 2px));
+  opacity: 0; transform: scale(.5); transition: opacity .16s, transform .16s;
+}
+.edgerunners input[type=checkbox]:is(:hover, :checked, :focus-visible):before { background: currentColor; }
+.edgerunners input[type=checkbox]:checked:after { opacity: 1; transform: scale(1); }
+.edgerunners input[type=checkbox]:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+.edgerunners input[type=checkbox]:disabled { opacity: .45; cursor: not-allowed; }
+.edgerunners .oracle-source-picker input[type=checkbox] { --checkbox-ink: var(--pink); }
 .edgerunners :is(input:not([type=checkbox]), textarea, .cyber-select-trigger, .session-combo-field) {
   background: var(--input);
   border-radius: 0;
@@ -401,17 +411,34 @@
 .edgerunners .stack-heading h3 > span { font-size: 18px; font-weight: 700; letter-spacing: .02em; }
 .edgerunners .stack-heading h3 small { font-size: 14px; font-weight: 400; }
 .edgerunners .stack-address i { opacity: .8; }
+.edgerunners .stack-file {
+  --file-edge: color-mix(in srgb, var(--category-ink) 60%, var(--border));
+  --file-cut-top: 20px;
+  --file-cut-bottom: 12px;
+}
 .edgerunners .stack-file:before,
 .edgerunners .stack-file:after {
   background: color-mix(in srgb, var(--category-ink) 12%, var(--bg));
-  border-color: color-mix(in srgb, var(--category-ink) 60%, var(--border));
+  border-color: var(--file-edge);
 }
 .edgerunners .stack-file-open {
   color: var(--text);
   border: 0;
   background: color-mix(in srgb, var(--category-ink) 20%, var(--panel));
   box-shadow: none;
-  clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+  clip-path: polygon(0 0, calc(100% - var(--file-cut-top)) 0, 100% var(--file-cut-top), 100% 100%, var(--file-cut-bottom) 100%, 0 calc(100% - var(--file-cut-bottom)));
+}
+/* A one-pixel ring follows the clipped silhouette, including both diagonal cuts. */
+.edgerunners .file-outline {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: var(--file-edge);
+  clip-path: polygon(evenodd,
+    0 0, calc(100% - var(--file-cut-top)) 0, 100% var(--file-cut-top),
+    100% 100%, var(--file-cut-bottom) 100%, 0 calc(100% - var(--file-cut-bottom)), 0 0,
+    1px 1px, calc(100% - var(--file-cut-top) - .4px) 1px, calc(100% - 1px) calc(var(--file-cut-top) + .4px),
+    calc(100% - 1px) calc(100% - 1px), calc(var(--file-cut-bottom) + .4px) calc(100% - 1px),
+    1px calc(100% - var(--file-cut-bottom) - .4px), 1px 1px
+  );
 }
 .edgerunners .stack-file-open:before {
   inset: auto 0 8px auto;
@@ -453,32 +480,54 @@
 .edgerunners .file-path strong { color: var(--yellow); }
 
 /* Open transmissions, tools and reference documents use the same hard edges. */
+.edgerunners { --file-padding: 16px; }
+.edgerunners .document-heading {
+  min-height: 72px; padding: 12px var(--file-padding); gap: 10px;
+  background: color-mix(in srgb, var(--category-ink) 18%, var(--panel)); border: 0;
+}
+.edgerunners .document-heading h4 {
+  min-width: 0; flex: 1; margin: 0; color: var(--text);
+  font: 700 16px/1.55 var(--heading); overflow-wrap: anywhere;
+}
+.edgerunners .document-heading .icon-button { flex: 0 0 48px; width: 48px; height: 48px; }
+.edgerunners .reference-document > p { padding-inline: var(--file-padding); }
+.edgerunners .file-body { --tool-control-height: 48px; padding: var(--file-padding); min-width: 0; }
+.edgerunners .tool-body .tool-title { margin-bottom: 16px; gap: 12px; flex-wrap: wrap; }
+.edgerunners .tool-body .tool-title h3 { font-size: 18px; line-height: 1.55; }
+.edgerunners .file-body .tool-description { font-size: 18px; line-height: 1.6; }
+.edgerunners .tool-body :is(textarea, .empty-state p) { font-size: 18px; line-height: 1.6; }
+.edgerunners .tool-body :is(.record-heading h4, .record-details summary strong) { font-size: 18px; line-height: 1.55; }
+.edgerunners .file-body label { font-size: 16px; }
+.edgerunners .tool-body .form-grid > label { display: grid; gap: 8px; }
+.edgerunners .tool-body .form-grid > label > :is(input, .cyber-select) { margin: 0; }
+.edgerunners .tool-body .icon-button { width: 48px; height: 48px; }
+.edgerunners .tool-body .mission-field > .icon-button { top: 32px; }
+.edgerunners .tool-body .mission-field textarea { padding-right: 58px; }
 .edgerunners .generated-result {
+  --tool-ink: var(--category-ink);
+  padding: 0;
   background: var(--bg);
   border: 0;
   box-shadow: 5px 5px 0 var(--shadow);
 }
-.edgerunners .generated-result .eyebrow { color: var(--yellow); }
-.edgerunners .generated-result h3 { color: var(--yellow); font-size: 18px; font-weight: 800; text-shadow: none; }
-.edgerunners .generated-result > p { color: var(--soft); }
-.edgerunners .result-actions { border-color: var(--border); }
-.edgerunners .result-actions button { color: var(--cyan); }
-.edgerunners .result-actions button:hover { color: var(--yellow); }
+.edgerunners .result-text { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; color: var(--soft); font-size: 18px; line-height: 1.6; }
+.edgerunners .result-actions { border-color: var(--border); gap: 10px; margin-top: 16px; padding-top: 16px; }
+.edgerunners .encounter-file { --tool-ink: var(--category-ink); margin: 13px 2px 8px; border: 0; background: var(--panel); box-shadow: 5px 5px 0 var(--shadow); }
+.edgerunners .encounter-panel > .tool-description { margin: 0; }
+.edgerunners .encounter-panel > .tool-form { margin: 18px 0 0; }
+.edgerunners .encounter-panel .cyber-select-trigger > svg { color: var(--tool-ink); }
+.edgerunners .encounter-panel .cyber-select-menu { --cyan: var(--tool-ink); }
 .edgerunners .dm-tools .tool-workspace {
   background: var(--panel);
   border: 0;
   box-shadow: 5px 5px 0 var(--shadow);
 }
-.edgerunners .tool-workspace .file-window-label { border: 0; background: color-mix(in srgb, var(--tool-ink) 18%, var(--panel)); font-weight: 700; }
-.edgerunners .tool-workspace .file-window-label:before { display: none; }
 .edgerunners .tool-workspace :is(.clock-record, .challenge-record, .record-details, .custom-table, .ip-row, .balance-grid) {
   background: var(--input);
   border-color: var(--border);
   box-shadow: none;
 }
 .edgerunners .tool-workspace :is(.clock-record, .challenge-record, .record-details, .custom-table) { border: 0; }
-.edgerunners .tool-workspace .secondary-button.cyber-action { background: color-mix(in srgb, var(--tool-ink) 16%, var(--input)); }
-.edgerunners .tool-workspace .secondary-button.cyber-action:hover { background: color-mix(in srgb, var(--tool-ink) 12%, var(--input)); }
 .edgerunners .tool-workspace :is(input:not([type=checkbox]), textarea):focus { box-shadow: none; outline-color: var(--tool-ink); }
 .edgerunners .clock-display > strong { color: var(--tool-ink); text-shadow: none; }
 .edgerunners .clock-segments > span { border-radius: 0; transform: skewX(-9deg); }
@@ -486,8 +535,42 @@
 .edgerunners .challenge-dots > .win { background: var(--green); color: var(--bg); border-color: var(--green); }
 .edgerunners .challenge-dots > .loss { background: var(--orange); color: var(--bg); border-color: var(--orange); }
 .edgerunners .reference-document { border: 0; }
-.edgerunners .document-heading { background: color-mix(in srgb, var(--category-ink) 18%, var(--panel)); border: 0; }
-.edgerunners .document-heading h4 { color: var(--text); }
+.edgerunners .reference-notes-layer {
+  position: absolute; inset: 0; z-index: 40; pointer-events: none; isolation: isolate;
+  /* Saved desktop positions must not widen the mobile viewport during resize. */
+  overflow-x: clip;
+}
+.edgerunners .reference-note {
+  position: absolute; display: flex; flex-direction: column; margin: 0; pointer-events: auto;
+  background: var(--input);
+  box-shadow: none; animation: none; outline: none;
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%);
+}
+.edgerunners .reference-note .document-heading {
+  flex: 0 0 72px; min-height: 72px; padding: 11px 12px; gap: 0; cursor: grab; touch-action: none;
+  background: color-mix(in srgb, var(--category-ink) 18%, var(--panel));
+}
+.edgerunners .reference-note .document-heading h4 {
+  min-width: 0; margin-right: 8px; line-height: 1.4; overflow: hidden;
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;
+}
+.edgerunners .reference-note .document-heading .icon-button { flex-basis: 32px; width: 32px; padding: 0; }
+.edgerunners .reference-note.is-moving .document-heading { cursor: grabbing; }
+.edgerunners .reference-note.is-pinned { position: fixed; }
+.edgerunners .reference-note-body { flex: 1; min-height: 0; overflow: auto; }
+.edgerunners .reference-note-body[hidden] { display: none; }
+.edgerunners .reference-note-body > p { font-size: 18px; line-height: 1.6; color: var(--soft); padding: 14px var(--file-padding); }
+.edgerunners .reference-note-body > .document-source { font: 14px/1.6 var(--mono); color: var(--muted); }
+.edgerunners .reference-note .table-scroll { max-height: none; }
+.edgerunners .reference-note .document-foot { padding-right: 56px; }
+.edgerunners .reference-note-resize {
+  position: absolute; bottom: 0; right: 0; width: 48px; height: 48px; color: var(--category-ink);
+  background: var(--panel); cursor: nwse-resize; touch-action: none;
+}
+.edgerunners .reference-note.is-collapsed .document-heading { border-bottom: 0; }
+.edgerunners .reference-document .cyber-action { --control-ink: var(--category-ink); }
+.edgerunners.reader-mode .reference-document :is(.table-scroll th, .document-heading > .icon-button:not([aria-pressed])) { color: color-mix(in srgb, var(--category-ink) 40%, var(--text)); }
+.edgerunners.reader-mode .reference-document .cyber-action { --control-ink: color-mix(in srgb, var(--category-ink) 40%, var(--text)); }
 .edgerunners .table-scroll th { background: var(--input); color: var(--category-ink, var(--yellow)); border-color: var(--border); }
 .edgerunners .table-scroll td { border-color: var(--border-soft); }
 .edgerunners .table-scroll tbody tr:nth-child(even) td { background: color-mix(in srgb, var(--panel-raised) 45%, transparent); }
@@ -529,6 +612,44 @@
 .edgerunners .toast { background: var(--acid); color: var(--on-acid); border-color: var(--acid); border-radius: 0; box-shadow: 5px 5px 0 var(--shadow); }
 .edgerunners .error-banner { color: var(--orange); background: var(--panel); border-color: var(--orange); }
 
+/* Preparation tools share typography, control geometry and surfaces in both themes. */
+.edgerunners .prep-tool { min-width: 0; }
+.edgerunners .prep-form > label { min-width: 0; }
+.edgerunners .prep-form > label:not(.grow):not(.full-width) { flex: 1 1 140px; }
+.edgerunners .prep-form > .grow { flex: 2 1 220px; }
+.edgerunners .prep-form label > :is(input, .cyber-select) { width: 100%; }
+.edgerunners .prep-tool textarea { min-height: 90px; margin-block: 5px 14px; }
+.edgerunners .prep-tool :is(label, p, td, th) { font-size: 16px; }
+.edgerunners .prep-records { display: flex; flex-direction: column; gap: 16px; margin-block: 18px; }
+.edgerunners .prep-record { min-width: 0; padding: 18px; background: var(--input); }
+.edgerunners .prep-record .record-heading { flex-wrap: wrap; align-items: center; margin-bottom: 14px; gap: 10px; }
+.edgerunners .prep-record h4 { overflow-wrap: anywhere; font-size: 18px; }
+.edgerunners .market-stock { margin-block: 10px 14px; }
+.edgerunners .market-stock table { min-width: 660px; }
+.edgerunners .market-stock th { background: var(--panel); color: var(--tool-ink); font-weight: 600; }
+.edgerunners .market-stock td { padding: 10px 8px; vertical-align: top; }
+.edgerunners .market-stock td:first-child { width: 42%; min-width: 210px; }
+.edgerunners .market-stock td input { width: 100%; min-height: 48px; padding-inline: 10px; }
+.edgerunners .market-stock td:nth-child(2), .edgerunners .market-stock td:nth-child(3) { width: 100px; }
+.edgerunners .market-stock .stock-note { margin-top: 5px; }
+.edgerunners .market-stock td:last-child { text-align: center; }
+.edgerunners .net-graph-heading { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin-block: 18px 8px; }
+.edgerunners .net-graph-heading strong { flex: 1; font-size: 18px; overflow-wrap: anywhere; }
+.edgerunners .net-graph-heading span { font-size: 14px; color: var(--muted); }
+.edgerunners .net-graph-scroll { overflow: auto; max-height: 640px; background: var(--input); margin-bottom: 18px; }
+.edgerunners .net-graph { display: block; margin-inline: auto; }
+.edgerunners .net-connection { fill: none; stroke: var(--cyan); stroke-width: 2; }
+.edgerunners .net-node { cursor: pointer; outline: none; }
+.edgerunners .net-node polygon { fill: var(--panel); stroke: var(--border); stroke-width: 1.5; }
+.edgerunners .net-node.is-selected polygon, .edgerunners .net-node:focus-visible polygon { stroke: var(--tool-ink); stroke-width: 3; }
+.edgerunners .net-node text { fill: var(--text); font: 600 16px 'Rajdhani', sans-serif; }
+.edgerunners .net-node .net-node-kind { font-size: 14px; fill: var(--cyan); }
+.edgerunners .net-floor-editor { margin-top: 18px; }
+@media (max-width: 600px) {
+  .edgerunners .file-body .tool-form > button, .edgerunners .prep-form > .grow { flex-basis: 100%; }
+  .edgerunners .prep-record { padding: 14px; }
+}
+
 /* A brief color-channel split on interaction, never a continuous flash. */
 .edgerunners .drive-nav > button:hover .drive-copy strong,
 .edgerunners .language-switch button:hover strong,
@@ -555,12 +676,14 @@
 }
 @media (max-width: 1160px) {
   .edgerunners .site-header .session-action-label { display: none; }
+  .edgerunners .site-header .session-action-icon { display: block; }
   .edgerunners .site-header .session-action { width: 48px; padding-inline: 0; }
 }
 @media (max-width: 980px) {
   .edgerunners .site-header { grid-template-columns: auto minmax(0, 1fr); gap: 12px; }
   .edgerunners .site-header .session-bar { grid-column: 1 / -1; grid-row: 2; max-width: none; }
   .edgerunners .site-header .session-action-label { display: inline; }
+  .edgerunners .site-header .session-action-icon { display: none; }
   .edgerunners .site-header .session-action { width: auto; padding-inline: 17px; }
 }
 @media (max-width: 600px) {
@@ -576,6 +699,7 @@
   .edgerunners .site-header .session-bar { margin-top: 20px; gap: 8px; }
   .edgerunners .site-header .session-count { display: none; }
   .edgerunners .site-header .session-action-label { display: none; }
+  .edgerunners .site-header .session-action-icon { display: block; }
   .edgerunners .site-header .session-action { width: 48px; padding-inline: 0; }
   .edgerunners .site-header .session-editor { padding: 16px; }
 }

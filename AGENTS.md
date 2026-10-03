@@ -1,6 +1,11 @@
 # Project workflow
 
+- Treat Magnus DM as an interactive GM screen for reference and preparation. Foundry handles play and the calendar. Night Markets and NET architectures support creation and editing only; do not add purchases, restocking, floor revelation, player modes or netrunner position tracking.
+- Localize preparation controls, category labels and generated catalog names through the existing ES/EN translation system. Preserve authored names and notes when switching language.
+- Keep screamsheets removed. DM tools start with no active tool on page load or reload; only open a workspace after the user selects a tool.
 - Work locally and provide a local preview for review.
+- All action buttons, including Favorites, reuse the same `cyber-action` appearance as New session: shared typography, solid fill, angular cuts and interaction effects. Do not introduce separate primary, secondary or outline appearances; preserve category colors, the favorite chip state, disabled behavior and keyboard focus.
+- Labelled action buttons use text only. Keep icons for controls without visible text, dropdown arrows, navigation and favorite state markers. New session shows its plus only when its label is hidden on compact screens.
 - Publishing or redeploying to GitHub Pages requires the user's explicit approval of the changes. A request to edit or continue is not publication approval.
 - Preserve Magnus Laser's original cyberpunk visual identity from the sibling `cyber-manager` project: Orbitron / Rajdhani typography, saturated neon palette, original logo, glitch and CRT effects. Use the branded city wallpaper; the user explicitly removed Matrix rain.
 - The current visual direction is Edgerunners-inspired: category-colored active navigation (lime for the DM desk, cyan for generators, magenta for reference tables, orange for the map), ink-dark surfaces, cyan/magenta signals, hard offset shadows and angular graphic cuts. Active sections must retain their own color rather than all turning acid yellow. Apply it consistently across the whole app through `app/edgerunners.css`, retaining Magnus Laser's orange branding, original fonts/logo and city artwork. Keep glitch brief and interactive, readable text contrast and the shared geometry of both themes.

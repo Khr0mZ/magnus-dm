@@ -20,6 +20,8 @@
 # misc
 .DS_Store
 *.pem
+/.history
+/.stuff/
 
 # debug
 npm-debug.log*

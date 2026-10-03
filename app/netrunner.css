@@ -61,7 +61,7 @@
 .panel-heading h2, .sidebar-heading h2 { font-size: 14px; line-height: 1.65; }
 .panel-heading h2 > span { flex-shrink: 0; }
 .oracle-body { padding: 16px; }
-.tool-description, .empty-state p, .encounter-panel > p { font-size: 18px; line-height: 1.6; }
+.tool-description, .empty-state p { font-size: 18px; line-height: 1.6; }
 .oracle-actions { flex-wrap: wrap; }
 .oracle-actions select { flex-basis: 140px; }
 .oracle-output strong { font-size: 15px; }
@@ -95,16 +95,10 @@
 /* Compact executable files, keeping labels readable instead of shrinking type. */
 .file-grid.file-list { grid-template-columns: minmax(0, 1fr); }
 .encounter-file { margin-top: 12px; border: 1px solid var(--cyan); animation: directory-reveal .22s ease-out; }
-.encounter-file .encounter-panel { margin: 0; border: 0; box-shadow: none; }
-.encounter-file .file-window-label { margin: 0; padding: 8px 14px; }
-.encounter-file .file-window-label > button { margin-left: auto; }
-.encounter-file .inline-form { flex-wrap: wrap; }
-.encounter-file select { flex: 1 1 160px; }
 .result-dock { position: sticky; top: 12px; z-index: 6; margin-bottom: 16px; background: var(--bg); box-shadow: 0 5px 24px color-mix(in srgb, var(--bg) 80%, transparent); }
-.result-dock .generated-result { margin: 0; max-height: min(340px, 45dvh); overflow: auto; }
-.generated-result > p { font-size: 18px; line-height: 1.7; }
-.result-actions { flex-wrap: wrap; gap: 8px 18px; }
-.result-actions button { min-height: 36px; }
+.result-dock .generated-result { display: flex; flex-direction: column; margin: 0; max-height: min(440px, 55dvh); }
+.result-dock .generated-result > .document-heading { flex-shrink: 0; }
+.result-dock .generated-result > .file-body { min-height: 0; overflow: auto; }
 
 /* DM tools grouped into folders, opening into one active workspace. */
 .tool-folders { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 10px 0 18px; }
@@ -115,8 +109,7 @@
 .tool-folder .tool-selector > button > span { flex: 1; min-width: 0; }
 .tool-folder .tool-selector > button:hover { transform: translateX(3px); }
 .tool-workspace { padding: 18px; }
-.file-window-label { display: flex; align-items: center; gap: 9px; color: var(--green); font: 14px/1.6 var(--mono); padding: 0 0 12px; margin-bottom: 18px; border-bottom: 1px solid var(--border); }
-.tool-workspace > .file-window-label ~ * { animation: directory-reveal .2s ease-out; }
+.tool-workspace > .tool-body { animation: directory-reveal .2s ease-out; }
 .tool-title h3 { font-size: 16px; }
 .tool-form input, .tool-form select, .record-content input, .form-grid input, .form-grid select { font-size: 17px; }
 .record-content textarea, .mission-field textarea, .beat-row textarea { font-size: 18px; }

@@ -6,6 +6,130 @@ import { fileURLToPath } from 'node:url';
 await build({ configFile: false, publicDir: false, logLevel: 'silent', build: { outDir: 'work/tests', emptyOutDir: true, minify: false, lib: { entry: fileURLToPath(new URL('./entry.ts', import.meta.url)), formats: ['es'], fileName: () => 'engine.mjs' } } });
 const engine = await import('../work/tests/engine.mjs');
 
+test('preparation records migrate into old sessions and survive switching without changing existing content or favorites', () => {
+  const legacy = engine.emptySession();
+  delete legacy.preparation;
+  legacy.notes = 'Keep my session';
+  legacy.npcs = [{ id: 'ally', name: 'Zero', role: 'Fixer', status: 'Vivo', relationship: 'Aliado', notes: 'Do not change', stats: 'REF 8' }];
+  const original = JSON.stringify(legacy);
+  const library = engine.createSessionLibrary(legacy);
+  const restored = engine.parseSessionLibrary(JSON.stringify(library));
+  assert.deepEqual(restored.sessions[0].data.preparation, engine.emptyPreparation());
+  assert.equal(restored.sessions[0].data.notes, legacy.notes);
+  assert.deepEqual(restored.sessions[0].data.npcs, legacy.npcs);
+  assert.deepEqual(restored.favorites, library.favorites);
+  assert.equal(JSON.stringify(legacy), original, 'migration leaves the source untouched');
+  const storage = { raw: JSON.stringify(library), getItem() { return this.raw; }, setItem(_key, value) { this.raw = value; } };
+  const store = engine.createSessionStore(() => storage);
+  store.hydrate();
+  store.setSession(session => ({ ...session, preparation: { ...session.preparation, markets: [engine.createMarket('Kabuki', 'mixed', 3, 1000, 'es')], architectures: [engine.createArchitecture('Security', 8, 2, 8, 'en')] } }));
+  store.createSession('second', 'Second night');
+  assert.equal(engine.activeSession(store.getSnapshot().library).preparation.markets.length, 0);
+  store.selectSession('initial');
+  const returned = engine.activeSession(store.getSnapshot().library);
+  assert.equal(returned.preparation.markets[0].name, 'Kabuki');
+  assert.equal(returned.preparation.architectures[0].floors.length, 8);
+  assert.equal(returned.notes, 'Keep my session');
+  const broken = JSON.parse(storage.raw);
+  broken.sessions[0].data.preparation.markets[0].stalls[0].items[0].stock = -1;
+  assert.throws(() => engine.parseSessionLibrary(JSON.stringify(broken)), 'invalid new data is not silently reset');
+});
+
+test('night market preparation respects categories and price caps', () => {
+  for (const language of ['es', 'en']) for (const category of engine.marketCategories) {
+    const catalog = engine.marketCatalog(category.key, language);
+    assert.ok(catalog.length, `${category.key} has real catalog items`);
+    const market = engine.createMarket('Test', category.key, 2, 1000, language);
+    assert.equal(market.stalls.length, 2);
+    for (const stall of market.stalls) {
+      assert.equal(stall.category, category.key);
+      assert.ok(stall.items.length);
+      assert.equal(new Set(stall.items.map(item => item.name)).size, stall.items.length);
+      assert.ok(stall.items.every(item => item.price <= 1000 && item.stock > 0 && !item.name.startsWith('t:')));
+    }
+  }
+  assert.throws(() => engine.createMarket('Test', 'missing', 2, 1000, 'es'));
+});
+
+test('catalog names follow the selected language while authored names survive migration', () => {
+  const market = engine.createMarket('', 'weapons', 1, 1000, 'es');
+  assert.equal(engine.preparationName(market, 'en'), 'Night Market');
+  assert.equal(engine.preparationName(market.stalls[0], 'en'), 'Weapons 1');
+  const pistol = engine.marketCatalog('weapons', 'es').find(item => item.nameKey === 't:weapons.mediumPistol');
+  assert.ok(pistol);
+  assert.equal(engine.preparationName(pistol, 'en'), 'Medium Pistol');
+  assert.equal(engine.preparationName({ ...pistol, name: 'La pistola de Zero' }, 'en'), 'La pistola de Zero');
+  const session = engine.emptySession();
+  session.preparation.markets = [market];
+  session.preparation.architectures = [engine.createArchitecture('Red de Zero', 6, 0, 8, 'es')];
+  session.preparation.calendar = { date: '2080-01-01', tasks: [] };
+  session.preparation.screamsheets = [{ id: 'old-edition', name: 'Retired tool' }];
+  const architecture = session.preparation.architectures[0];
+  architecture.notes = 'Notas propias';
+  architecture.positionId = architecture.floors[0].id;
+  architecture.floors[0].revealed = true;
+  for (const floor of architecture.floors) delete floor.nameKey;
+  const migrated = engine.parseSession(JSON.stringify(session)).preparation;
+  assert.equal(Object.hasOwn(migrated, 'calendar'), false);
+  assert.equal(Object.hasOwn(migrated, 'screamsheets'), false);
+  assert.equal(Object.hasOwn(migrated.architectures[0], 'positionId'), false);
+  assert.equal(Object.hasOwn(migrated.architectures[0].floors[0], 'revealed'), false);
+  assert.equal(migrated.architectures[0].notes, 'Notas propias');
+  assert.equal(migrated.architectures[0].name, 'Red de Zero');
+  assert.equal(engine.preparationName(migrated.architectures[0].floors[0], 'en'), 'Restricted access');
+  assert.equal(engine.validPreparation(migrated), true);
+});
+
+test('authored names matching generated labels remain literal through repeated saves', () => {
+  const session = engine.emptySession();
+  const market = engine.createMarket('Mercado nocturno', 'weapons', 1, 1000, 'es');
+  market.stalls[0].name = 'Armas 1';
+  market.stalls[0].nameKey = null;
+  market.stalls[0].items[0] = {
+    ...market.stalls[0].items[0], name: 'Pistola mediana', nameKey: null, notes: 'Texto del narrador',
+  };
+  const architecture = engine.createArchitecture('Arquitectura NET', 6, 0, 8, 'es');
+  architecture.floors[0].nameKey = null;
+  session.preparation = { markets: [market], architectures: [architecture] };
+  let saved = session;
+  for (let reload = 0; reload < 3; reload++) saved = engine.parseSession(JSON.stringify(saved));
+  const restored = saved.preparation;
+  assert.equal(engine.preparationName(restored.markets[0], 'en'), 'Mercado nocturno');
+  assert.equal(engine.preparationName(restored.markets[0].stalls[0], 'en'), 'Armas 1');
+  assert.equal(engine.preparationName(restored.markets[0].stalls[0].items[0], 'en'), 'Pistola mediana');
+  assert.equal(engine.preparationName(restored.architectures[0], 'en'), 'Arquitectura NET');
+  assert.equal(engine.preparationName(restored.architectures[0].floors[0], 'en'), 'Acceso restringido');
+  assert.equal(engine.preparationName(restored.architectures[0].floors[1], 'en'), 'Operations data');
+  assert.match(engine.marketText(restored.markets[0], 'en'), /Pistola mediana.*Stock:/);
+  assert.match(engine.marketText(restored.markets[0], 'en'), /Texto del narrador/);
+});
+
+test('NET generation keeps one connected acyclic root and obeys the requested branch limit', () => {
+  for (let run = 0; run < 100; run++) for (const branches of [0, 1, 4]) {
+    const architecture = engine.createArchitecture('Security', 18, branches, 8, 'en');
+    assert.equal(architecture.floors.length, 18);
+    assert.equal(engine.validArchitecture(architecture), true);
+    assert.ok(architecture.floors.filter(floor => architecture.floors.filter(child => child.parentId === floor.id).length === 2).length <= branches);
+    assert.equal(engine.netPositions(architecture.floors).positions.size, 18);
+  }
+  const architecture = engine.createArchitecture('Security', 6, 0, 8, 'en');
+  architecture.notes = 'ARCHITECTURE-SECRET';
+  architecture.floors[0].notes = 'FLOOR-SECRET';
+  const notes = engine.architectureText(architecture, 'en');
+  assert.match(notes, /ARCHITECTURE-SECRET/);
+  assert.match(notes, /FLOOR-SECRET/);
+  const reparented = engine.reparentNetFloor(architecture, architecture.floors[5].id, architecture.floors[1].id);
+  assert.equal(reparented.floors[5].parentId, architecture.floors[1].id);
+  assert.equal(engine.validArchitecture(reparented), true);
+  const reduced = engine.removeFloorBranch(architecture, architecture.floors[2].id);
+  assert.equal(reduced.floors.length, 2);
+  assert.equal(engine.validArchitecture(reduced), true);
+  assert.deepEqual(engine.removeFloorBranch(architecture, architecture.floors[0].id), architecture);
+  const cycle = structuredClone(architecture);
+  cycle.floors[1].parentId = cycle.floors[5].id;
+  assert.equal(engine.validArchitecture(cycle), false);
+});
+
 test('a cached wallpaper finishes loading even when its load event happened before hydration', async () => {
   const image = new EventTarget();
   Object.assign(image, { complete: true, naturalWidth: 1920, decode: async () => {} });
@@ -150,8 +274,9 @@ test('reference copy contains translated headers and every data row', () => {
   for (const language of ['es', 'en']) {
     const copied = engine.formatReference(table, language).split('\n');
     assert.equal(copied[0], engine.referenceLabel(table.titleKey, language));
-    assert.equal(copied.length, 2 + table.rows.length);
-    assert.equal(copied[1].split('\t').length, table.columns.length);
+    const headerIndex = table.descriptionKey ? 2 : 1;
+    assert.equal(copied.length, headerIndex + 1 + table.rows.length + Number(!!table.sourceKey));
+    assert.equal(copied[headerIndex].split('\t').length, table.columns.length);
     assert.ok(copied.every(line => !line.includes('t:combat.')));
   }
 });
@@ -170,7 +295,8 @@ test('Mission Kit quickhack references copy all eleven effects with their source
     }
   }
   const copy = key => engine.formatReference(tables.find(table => table.key === key), 'en');
-  assert.match(copy('cemkTurn'), /Only 1 Quickhack attempt per target per turn, even if it fails/i);
+  assert.match(copy('cemkTurn'), /Each specific Quickhack may be attempted only once per target per turn/i);
+  assert.match(copy('cemkTurn'), /another Quickhack against the same target/i);
   assert.match(copy('cemkQuickhacks8'), /4 direct HP damage/);
   assert.match(copy('cemkQuickhacks8'), /GM chooses 3/);
   assert.match(copy('cemkQuickhacks8'), /Cybereye/);
@@ -448,6 +574,209 @@ function sessionStorageFixture() {
   const active = store => engine.activeSession(store.getSnapshot().library);
   return { values, open, active, setWritable: value => { writable = value; } };
 }
+
+test('removing configurable screens preserves saved sessions and favorites across reloads', () => {
+  const fixture = sessionStorageFixture();
+  const older = engine.createSessionLibrary({ ...engine.emptySession(), notes: 'Keep this case' });
+  older.referenceScreens = [{ id: 'combat', name: 'Old screen', tables: ['critBody'], notes: 'Removed screen note' }];
+  older.favorites.references = ['critBody'];
+  fixture.values.set(engine.SESSION_LIBRARY_KEY, JSON.stringify(older));
+  const store = fixture.open();
+  assert.ok(!Object.hasOwn(store.getSnapshot().library, 'referenceScreens'));
+  assert.equal(fixture.active(store).notes, 'Keep this case');
+  assert.deepEqual(store.getSnapshot().library.favorites.references, ['critBody']);
+  store.setSession(current => ({ ...current, notes: 'Updated case note' }));
+  const reopened = fixture.open();
+  assert.equal(fixture.active(reopened).notes, 'Updated case note');
+  assert.deepEqual(reopened.getSnapshot().library.favorites.references, ['critBody']);
+  assert.ok(!Object.hasOwn(JSON.parse(fixture.values.get(engine.SESSION_LIBRARY_KEY)), 'referenceScreens'));
+});
+
+test('floating references migrate without auto-opening or changing older session data', () => {
+  const fixture = sessionStorageFixture();
+  const older = engine.createSessionLibrary({ ...engine.emptySession(), notes: 'My authored clues' });
+  delete older.referenceNotes;
+  older.favorites.references = ['combatActions', 'critBody'];
+  fixture.values.set(engine.SESSION_LIBRARY_KEY, JSON.stringify(older));
+  const store = fixture.open();
+  assert.deepEqual(store.getSnapshot().library.referenceNotes, {});
+  assert.deepEqual(store.getSnapshot().library.favorites.references, older.favorites.references);
+  assert.equal(fixture.active(store).notes, 'My authored clues');
+  assert.equal(fixture.values.get(engine.SESSION_LIBRARY_KEY), JSON.stringify(older), 'hydration does not rewrite the older library');
+});
+
+test('floating references preserve independent open, fold, pin, size and position states across sessions and reloads', () => {
+  const fixture = sessionStorageFixture();
+  const store = fixture.open();
+  for (const key of ['combatActions', 'critBody']) {
+    store.toggleFavorite('references', key);
+    store.toggleReferenceNote(key);
+  }
+  const first = store.getSnapshot().library.referenceNotes.combatActions;
+  store.updateReferenceNote('combatActions', { x: 170, y: 230, width: 740, height: 530, collapsed: true });
+  store.updateReferenceNote('critBody', { pinned: true });
+  const states = store.getSnapshot().library.referenceNotes;
+  assert.equal(states.combatActions.open, true);
+  assert.equal(states.critBody.open, true);
+  assert.equal(first.x, 40, 'prior snapshots stay unchanged');
+  store.createSession('next', 'Another session');
+  assert.deepEqual(store.getSnapshot().library.referenceNotes, states, 'reference preferences belong to the GM');
+  const reopened = fixture.open();
+  assert.deepEqual(reopened.getSnapshot().library.referenceNotes, states);
+  reopened.toggleReferenceNote('combatActions');
+  assert.equal(reopened.getSnapshot().library.referenceNotes.combatActions.open, false);
+  assert.deepEqual(reopened.getSnapshot().library.referenceNotes.critBody, states.critBody);
+  reopened.toggleReferenceNote('combatActions');
+  const restored = reopened.getSnapshot().library.referenceNotes.combatActions;
+  for (const field of ['x', 'y', 'width', 'height', 'collapsed']) assert.equal(restored[field], states.combatActions[field]);
+  assert.ok(restored.order > states.critBody.order, 'reopening brings only this note to the front');
+});
+
+test('reference changes merge other tabs and unfavoriting closes only that reference', () => {
+  const fixture = sessionStorageFixture();
+  const first = fixture.open();
+  for (const key of ['combatActions', 'critBody']) { first.toggleFavorite('references', key); first.toggleReferenceNote(key); }
+  const second = fixture.open();
+  second.updateReferenceNote('critBody', { x: 690, collapsed: true });
+  first.updateReferenceNote('combatActions', { width: 810 });
+  assert.equal(first.getSnapshot().library.referenceNotes.critBody.x, 690);
+  assert.equal(first.getSnapshot().library.referenceNotes.critBody.collapsed, true);
+  second.raiseReferenceNote('combatActions');
+  assert.equal(second.getSnapshot().library.referenceNotes.combatActions.width, 810);
+  second.toggleFavorite('references', 'critBody');
+  first.sync();
+  assert.ok(!Object.hasOwn(first.getSnapshot().library.referenceNotes, 'critBody'));
+  assert.equal(first.getSnapshot().library.referenceNotes.combatActions.open, true);
+  assert.deepEqual(first.getSnapshot().library.favorites.references, ['combatActions']);
+});
+
+test('failed note saves retain the saved state and malformed geometry never overwrites the library', () => {
+  const fixture = sessionStorageFixture();
+  const store = fixture.open();
+  store.toggleFavorite('references', 'combatActions');
+  store.toggleReferenceNote('combatActions');
+  const before = store.getSnapshot().library.referenceNotes.combatActions;
+  const raw = fixture.values.get(engine.SESSION_LIBRARY_KEY);
+  fixture.setWritable(false);
+  assert.equal(store.updateReferenceNote('combatActions', { open: false, x: 300 }), false);
+  assert.deepEqual(store.getSnapshot().library.referenceNotes.combatActions, before);
+  assert.equal(fixture.values.get(engine.SESSION_LIBRARY_KEY), raw);
+  fixture.setWritable(true);
+  assert.equal(store.updateReferenceNote('combatActions', { collapsed: true }), true);
+  const invalid = JSON.parse(fixture.values.get(engine.SESSION_LIBRARY_KEY));
+  invalid.referenceNotes.combatActions.width = '640';
+  const corrupt = JSON.stringify(invalid);
+  fixture.values.set(engine.SESSION_LIBRARY_KEY, corrupt);
+  const blocked = fixture.open();
+  assert.equal(blocked.getSnapshot().blocked, true);
+  assert.equal(blocked.updateReferenceNote('combatActions', { open: false }), false);
+  assert.equal(fixture.values.get(engine.SESSION_LIBRARY_KEY), corrupt);
+});
+
+test('reference notes remain reachable on small viewports and moving a folded note preserves its preferred size', () => {
+  const bounds = { x: 12, y: 184, width: 366, height: 648 };
+  const note = { ...engine.createReferenceNote(0), x: 1300, y: 900, width: 740, height: 530 };
+  assert.deepEqual(engine.fitReferenceNote(note, bounds), { x: 12, y: 302, width: 366, height: 530 });
+  const folded = { ...note, collapsed: true };
+  const moved = engine.changeReferenceNoteRect(folded, bounds, 'move', -2000, -2000);
+  assert.deepEqual(moved, { x: 12, y: 184, width: 740, height: 530 });
+  assert.equal(engine.fitReferenceNote({ ...folded, ...moved }, bounds).height, engine.NOTE_HEADER_HEIGHT);
+  assert.deepEqual(note, { ...engine.createReferenceNote(0), x: 1300, y: 900, width: 740, height: 530 }, 'fitting never overwrites the saved dimensions');
+  const resized = engine.changeReferenceNoteRect(engine.createReferenceNote(0), { x: 12, y: 98, width: 1416, height: 940 }, 'resize', -900, -900);
+  assert.equal(resized.width, 320);
+  assert.equal(resized.height, 220);
+});
+
+test('saved floating notes retire expansion and start unpinned without losing positions or session data', () => {
+  const fixture = sessionStorageFixture();
+  const older = engine.createSessionLibrary({ ...engine.emptySession(), notes: 'Keep my preparation' });
+  const previous = { ...engine.createReferenceNote(0), collapsed: true, expanded: true, width: 810, y: 240 };
+  delete previous.pinned;
+  older.favorites.references = ['combatActions'];
+  older.referenceNotes.combatActions = previous;
+  fixture.values.set(engine.SESSION_LIBRARY_KEY, JSON.stringify(older));
+  const store = fixture.open();
+  const migrated = store.getSnapshot().library.referenceNotes.combatActions;
+  assert.equal(migrated.pinned, false);
+  assert.equal(migrated.y, 240);
+  assert.equal(migrated.width, 810);
+  assert.equal(migrated.collapsed, true);
+  assert.ok(!Object.hasOwn(migrated, 'expanded'));
+  assert.equal(fixture.active(store).notes, 'Keep my preparation');
+  store.updateReferenceNote('combatActions', { pinned: true });
+  assert.equal(fixture.open().getSnapshot().library.referenceNotes.combatActions.pinned, true);
+  assert.ok(!Object.hasOwn(JSON.parse(fixture.values.get(engine.SESSION_LIBRARY_KEY)).referenceNotes.combatActions, 'expanded'));
+  const invalid = JSON.parse(fixture.values.get(engine.SESSION_LIBRARY_KEY));
+  invalid.referenceNotes.combatActions.pinned = 'yes';
+  assert.throws(() => engine.parseSessionLibrary(JSON.stringify(invalid)));
+});
+
+test('opening favorites while scrolled uses document coordinates, while pinned notes keep screen coordinates', () => {
+  const fixture = sessionStorageFixture();
+  const store = fixture.open();
+  const viewport = { bounds: { x: 12, y: 12, width: 1200, height: 800 }, scrollY: 1000 };
+  for (const key of ['combatActions', 'critBody']) { store.toggleFavorite('references', key); store.toggleReferenceNote(key, viewport); }
+  let notes = store.getSnapshot().library.referenceNotes;
+  assert.equal(notes.combatActions.pinned, false);
+  assert.equal(notes.combatActions.y, 1120, 'the new note appears at y=120 in the visible viewport');
+  store.updateReferenceNote('critBody', { pinned: true, y: 230 });
+  store.toggleReferenceNote('critBody');
+  store.toggleReferenceNote('critBody', viewport);
+  assert.equal(store.getSnapshot().library.referenceNotes.critBody.y, 230, 'reopening a pinned note does not add the page scroll');
+  store.updateReferenceNote('combatActions', { width: 740, height: 530, collapsed: true });
+  store.toggleReferenceNote('combatActions');
+  store.toggleReferenceNote('combatActions', { ...viewport, scrollY: 2000 });
+  notes = store.getSnapshot().library.referenceNotes;
+  assert.equal(notes.combatActions.y, 2012, 'a closed note outside the current view reopens where it can be reached');
+  assert.equal(notes.combatActions.width, 740);
+  assert.equal(notes.combatActions.height, 530);
+  assert.equal(notes.combatActions.collapsed, true);
+  assert.equal(notes.critBody.y, 230, 'opening another note does not move this one');
+});
+
+test('RED reference corrections preserve range DVs, critical tables and priced catalog names', () => {
+  const tables = engine.gmTableCategories.flatMap(category => category.tables);
+  const table = key => tables.find(table => table.key === key);
+  const copy = key => engine.formatReference(table(key), 'en');
+  assert.deepEqual(table('autofireDV').rows.map(row => row.cells.slice(1)), [[20,17,20,25,30], [22,20,17,20,25]]);
+  assert.equal(table('critBody').rows.length, 11);
+  assert.equal(table('critHead').rows.length, 11);
+  assert.match(copy('deathSaves'), /below BODY/);
+  assert.match(copy('deathSaves'), /natural 10/i);
+  assert.match(copy('coverConcealment'), /Steel\s+25\s+50/);
+  assert.match(copy('coverConcealment'), /Concrete\s+10\s+25/);
+  assert.match(copy('magazineCapacities'), /Cyberpunk RED.*344/);
+  assert.match(copy('ammoTypes'), /EMP\s+500 eb/);
+  assert.match(copy('ammoTypes'), /Poison\s+100 eb/);
+  assert.doesNotMatch(copy('drugEffects'), /Timewarp/i);
+  assert.match(copy('cyberaudio'), /Homing Tracer/);
+  assert.match(copy('humanityEmpathy'), /maximum −2 per piece with HL, −4 per Borgware/);
+  assert.ok(tables.every(table => table.descriptionKey && table.sourceKey), 'all rules identify their context and source');
+});
+
+test('hazards and medical references keep RED timing, prices and exceptions', () => {
+  const tables = engine.gmTableCategories.flatMap(category => category.tables);
+  const copy = key => engine.formatReference(tables.find(table => table.key === key), 'en');
+  assert.match(copy('fireRadiation'), /end of each Turn/i);
+  assert.match(copy('falls'), /10 m\/yd.*2d6/);
+  assert.match(copy('asphyxiationExposure'), /start of each Turn/i);
+  assert.match(copy('electricityPoisons'), /6d6/);
+  assert.match(copy('traumaTeam'), /1d6 Rounds/);
+  assert.match(copy('hospitalCare'), /highest-DV/);
+  assert.match(copy('addictionWithdrawal'), /one year/i);
+  assert.match(copy('therapyDVs'), /2d6 Humanity/);
+  assert.match(copy('drugEffects'), /additional dose extends the Primary Effect by its full duration/);
+});
+
+test('editable NPC starting stats derive HP and the wound threshold from BODY and WILL', () => {
+  for (let n = 0; n < 100; n++) {
+    const { stats, hp, seriouslyWounded } = engine.createNPCStats();
+    assert.equal(Object.keys(stats).length, 10);
+    assert.ok(Object.values(stats).every(value => value >= 2 && value <= 8));
+    assert.equal(hp, 10 + 5 * Math.ceil((stats.BODY + stats.WILL) / 2));
+    assert.equal(seriouslyWounded, Math.ceil(hp / 2));
+  }
+});
 
 test('session library migrates the existing session intact and keeps the original backup', () => {
   const fixture = sessionStorageFixture();

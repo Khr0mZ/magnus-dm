@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { Check, Link2, MapPin, Unplug, X } from 'lucide-react';
+import { Link2, MapPin, X } from 'lucide-react';
 import { type Entry } from '../lib/session';
 import { useLocale } from './locale';
 
@@ -34,9 +34,9 @@ export default function MapEntryEditor({ entry, enabled, onSave, onRemove, onClo
           <label>{t('Título')}<input required value={title} onChange={event => setTitle(event.target.value)} /></label>
           <label>{t('Contenido')}<textarea value={text} onChange={event => setText(event.target.value)} /></label>
           <div className="map-editor-actions">
-            <button type="submit" className="primary-button cyber-action map-editor-save"><Check size={18} aria-hidden="true" />{t('Guardar cambios')}</button>
+            <button type="submit" className="primary-button cyber-action map-editor-save">{t('Guardar cambios')}</button>
             <button type="button" className="outline-button cyber-action" onClick={onClose}>{t('Cancelar')}</button>
-            <button type="button" className="danger-button cyber-action map-editor-unlink" onClick={onRemove}><Unplug size={18} aria-hidden="true" />{t('Quitar marcador')}</button>
+            <button type="button" className="danger-button cyber-action map-editor-unlink" onClick={onRemove}>{t('Quitar marcador')}</button>
           </div>
         </fieldset>
       </div>

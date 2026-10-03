@@ -26,9 +26,14 @@ export default function OraclePanel({ history, log }: { history: Entry[]; log: (
       log(question.trim() || t('Pregunta al oráculo'), `${oracleAnswer(probability, value, language)}\nd100: ${value} · ${t(probabilities[probability].label)}`, 'oráculo');
     }
   }
-  return <section className="panel oracle-panel"><PanelHeading number="01" title={t('Oráculo')}/>
+  return <section className="panel oracle-panel">
+    <PanelHeading number="01" title={t('Oráculo')} aside={
+      <button type="button" className="mode-switch oracle-mode-switch" role="switch" aria-label={t('Pregunta abierta')} aria-checked={open} onClick={() => setOpen(current => !current)}>
+        <span><strong>{t(open ? 'Pregunta abierta' : 'Sí / No')}</strong></span>
+        <i aria-hidden="true"/>
+      </button>
+    }/>
     <div className="oracle-body">
-      <div className="segmented oracle-modes"><button type="button" className={!open ? 'selected' : ''} aria-pressed={!open} onClick={() => setOpen(false)}>{t('Sí / No')}</button><button type="button" className={open ? 'selected' : ''} aria-pressed={open} onClick={() => setOpen(true)}>{t('Pregunta abierta')}</button></div>
       <form onSubmit={event => { event.preventDefault(); ask(); }}>
         <label className="sr-only" htmlFor="oracle-question">{t('Pregunta al oráculo')}</label>
         <input id="oracle-question" placeholder={t(open ? '¿Qué está pasando aquí? ¿Quién está detrás?' : '¿Hay alguien al otro lado de la puerta?')} value={question} required={open} maxLength={250} onChange={event => setQuestion(event.target.value)}/>

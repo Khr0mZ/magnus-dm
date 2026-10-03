@@ -20,6 +20,12 @@ export function formatResult(value: unknown, language: Language = 'es'): string 
 export function createNPC() {
   return { Nombre: e.generateRandomName().name, Alias: e.generateHandle(), Rol: pick(e.rolesTable()), Apariencia: pick(t.npcAppearanceTable()), Ánimo: pick(t.npcMoodTable()), Motivación: pick(t.npcMotivationTable()), Secreto: q.generateQuickRumor() };
 }
+// An editable GM starting point, rather than a character-creation method.
+export function createNPCStats() {
+  const stats = Object.fromEntries(['INT', 'REF', 'DEX', 'TECH', 'COOL', 'WILL', 'LUCK', 'MOVE', 'BODY', 'EMP'].map(key => [key, die(7) + 1]));
+  const hp = 10 + 5 * Math.ceil((stats.BODY + stats.WILL) / 2);
+  return { stats, hp, seriouslyWounded: Math.ceil(hp / 2) };
+}
 export function createMission() {
   return {
     Contratante: `${translate(pick(['Fixer', 'Corporativo', 'Nómada', 'Periodista', 'Netrunner']))} ${e.generateRandomName().name}`,

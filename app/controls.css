@@ -2,41 +2,41 @@
    and Animations: glitch text, passing light and illuminated selection. */
 .site-header .brand { cursor: default; flex: 0 0 auto; }
 .page-shell { padding-bottom: 36px; }
+.application .cyber-action,
+.application .drive-nav > button {
+  clip-path: polygon(0 0, calc(100% - 9px) 0, 100% 9px, 100% 100%, 9px 100%, 0 calc(100% - 9px));
+}
 .application .cyber-action {
   --control-ink: var(--cyan);
   position: relative; isolation: isolate; overflow: hidden; display: inline-flex; align-items: center; justify-content: center; gap: 9px;
-  min-height: 44px; padding: 10px 17px; border: 1px solid var(--control-ink); border-radius: 0;
+  min-height: 48px; padding: 10px 17px; border: 1px solid var(--control-ink); border-radius: 0;
   color: var(--control-ink); background: linear-gradient(115deg, color-mix(in srgb, var(--control-ink) 14%, var(--panel)), var(--input));
-  font: 600 14px/1.5 var(--heading); letter-spacing: .04em; text-transform: uppercase;
-  clip-path: polygon(0 0, calc(100% - 9px) 0, 100% 9px, 100% 100%, 9px 100%, 0 calc(100% - 9px));
+  font: 600 14px/1.5 var(--heading); letter-spacing: .04em; text-transform: uppercase; white-space: normal;
   box-shadow: inset 0 0 15px color-mix(in srgb, var(--control-ink) 8%, transparent); transition: background .2s, box-shadow .2s;
 }
 .application .cyber-action:before { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(100deg, transparent 25%, color-mix(in srgb, var(--control-ink) 25%, transparent), transparent 75%); transform: translateX(-110%); transition: transform .5s; }
-.application .cyber-action:after { content: ''; position: absolute; bottom: 0; right: 10px; height: 2px; width: 28px; background: currentColor; transition: width .25s; }
+.application .cyber-action:after,
+.application .drive-nav > button:after,
+.application .drive-nav > button.active:after { content: ''; display: block; position: absolute; bottom: 0; left: auto; right: 10px; height: 2px; width: 28px; background: currentColor; box-shadow: none; transition: width .25s; }
 .application .cyber-action:hover:enabled, .application .cyber-action:focus-visible { background: color-mix(in srgb, var(--control-ink) 18%, var(--panel)); box-shadow: inset 0 0 20px color-mix(in srgb, var(--control-ink) 18%, transparent); text-shadow: 0 0 8px currentColor; }
 .application .cyber-action:hover:enabled:before { transform: translateX(110%); }
-.application .cyber-action:hover:enabled:after { width: calc(100% - 20px); }
+.application .cyber-action:hover:enabled:after,
+.application .drive-nav > button:hover:after { width: calc(100% - 20px); }
 .application .cyber-action:focus-visible { outline-offset: -5px; }
-.application .cyber-action:is([aria-pressed=true], [aria-expanded=true]) { --control-ink: var(--orange); background: color-mix(in srgb, var(--control-ink) 17%, var(--panel)); }
 .application .cyber-action:disabled { opacity: .45; }
 .application .session-action:first-child { --control-ink: var(--orange); }
-.application .favorite-filter { text-transform: none; }
-.favorite-filter .favorite-mark.is-active { color: var(--control-ink); }
 
-/* Top-level directories: cut terminal keys with a scan and a latched neon edge. */
+/* Top-level directories share the button cuts and keep their category colors. */
 .application .drive-nav { gap: 10px; margin: 0 0 24px; }
 .application .drive-nav > button {
   min-height: 100px; border: 0; border-radius: 0; padding: 16px 14px; position: relative; isolation: isolate; overflow: hidden;
-  clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
   background: linear-gradient(110deg, color-mix(in srgb, var(--drive) 9%, var(--panel)), var(--input) 85%);
   box-shadow: inset 0 1px color-mix(in srgb, var(--drive) 60%, transparent), inset 0 -1px color-mix(in srgb, var(--drive) 45%, transparent);
   transition: background .2s, box-shadow .2s; transform: none;
 }
 .application .drive-nav > button:before { content: ''; inset: 0; width: auto; height: auto; border: 0; clip-path: none; background: linear-gradient(105deg, transparent 20%, color-mix(in srgb, var(--drive) 20%, transparent), transparent 80%); transform: translateX(-110%); transition: transform .45s; pointer-events: none; }
-.application .drive-nav > button:after { content: ''; display: block; position: absolute; bottom: 0; left: 12px; right: 12px; height: 3px; width: auto; background: var(--drive); transform: scaleX(.12); transform-origin: left; transition: transform .25s; box-shadow: 0 0 12px var(--drive); }
 .application .drive-nav > button:hover, .application .drive-nav > button.active { color: var(--drive); background: linear-gradient(110deg, color-mix(in srgb, var(--drive) 22%, var(--panel)), var(--input) 85%); box-shadow: inset 0 1px var(--drive), inset 0 -1px var(--drive), inset 0 0 24px color-mix(in srgb, var(--drive) 12%, transparent); transform: none; }
 .application .drive-nav > button:hover:before { transform: translateX(110%); }
-.application .drive-nav > button:is(:hover, .active):after { display: block; transform: scaleX(1); }
 .application .drive-nav > button:hover .drive-copy strong { animation: original-button-glitch .35s steps(2) 1; }
 .application .drive-nav > button:focus-visible { outline-offset: -5px; }
 .application .drive-nav .drive-copy small { color: var(--soft); }
@@ -120,34 +120,28 @@
 
 /* DM tools share the file stacks used by generators and reference tables. */
 .dm-tool-stacks { margin-top: 14px; }
-.dm-tool-stacks .tool-workspace { margin: 4px 2px 16px; }
+.dm-tool-stacks .tool-workspace { margin: 13px 2px 8px; }
 .dm-tool-stacks .stack-file.is-open .stack-file-open { background: linear-gradient(150deg, color-mix(in srgb, var(--category-ink) 28%, var(--panel)), var(--panel) 80%); box-shadow: inset 0 1px var(--category-ink), inset 0 -3px var(--category-ink); }
 .dm-tool-stacks .stack-file.is-open .file-stamp > span:first-child { box-shadow: 0 2px var(--category-ink); }
 .tool-workspace:focus-visible { outline: 2px solid var(--tool-ink); outline-offset: 3px; }
-.tool-workspace .file-window-label > span { flex: 1; min-width: 0; }
-.tool-workspace .file-window-label > button { flex: 0 0 44px; width: 44px; height: 44px; color: var(--tool-ink); }
-.application .dm-tools .tool-workspace { --tool-control-height: 48px; border: 1px solid color-mix(in srgb, var(--tool-ink) 50%, var(--border)); border-radius: 0; padding: 18px; background: linear-gradient(115deg, color-mix(in srgb, var(--tool-ink) 4%, var(--panel)), var(--panel)); box-shadow: inset 0 2px color-mix(in srgb, var(--tool-ink) 35%, transparent); }
-.tool-workspace .file-window-label { color: var(--tool-ink); border-bottom-color: color-mix(in srgb, var(--tool-ink) 35%, transparent); text-transform: uppercase; letter-spacing: .06em; }
-.tool-workspace .file-window-label:before { content: ''; flex: 0 0 6px; height: 16px; background: var(--tool-ink); box-shadow: 0 0 10px color-mix(in srgb, var(--tool-ink) 35%, transparent); }
+.application .dm-tools .tool-workspace { border: 1px solid color-mix(in srgb, var(--tool-ink) 50%, var(--border)); border-radius: 0; padding: 0; background: linear-gradient(115deg, color-mix(in srgb, var(--tool-ink) 4%, var(--panel)), var(--panel)); box-shadow: inset 0 2px color-mix(in srgb, var(--tool-ink) 35%, transparent); }
 .tool-workspace .tool-title { align-items: center; }
 .tool-workspace .tool-title h3 { font-size: 18px; color: var(--tool-ink); text-shadow: none; }
 .tool-workspace :is(.record-heading h4, .record-details summary strong, .mission-field label) { color: var(--tool-ink); }
 .tool-workspace :is(.clock-record, .challenge-record, .record-details, .custom-table) { border-radius: 0; border-color: color-mix(in srgb, var(--tool-ink) 35%, var(--border));  }
 .tool-workspace .record-details[open] > summary { background: color-mix(in srgb, var(--tool-ink) 9%, transparent); }
 .tool-workspace .clock-segments > span.lit { border-color: var(--tool-ink); background: color-mix(in srgb, var(--tool-ink) 20%, var(--input)); box-shadow: inset 0 0 10px color-mix(in srgb, var(--tool-ink) 20%, transparent); }
-.application .tool-workspace .cyber-action { --control-ink: var(--tool-ink); min-height: var(--tool-control-height); }
-.application .tool-workspace .secondary-button.cyber-action { background: var(--input); border-color: color-mix(in srgb, var(--tool-ink) 65%, var(--border)); }
-.application .tool-workspace .outline-button { min-height: var(--tool-control-height); border-radius: 0; }
-.application .tool-workspace .outline-button:hover { color: var(--tool-ink); border-color: var(--tool-ink); }
+.application .file-body .cyber-action { --control-ink: var(--tool-ink); min-height: var(--tool-control-height); }
+.application .file-body .danger-button.cyber-action { --control-ink: var(--orange); }
 
 /* Labels share one gap; text inputs, selects and actions meet on the same edge.
    The old form > label bottom margin offset buttons by 14px. */
-.application .tool-workspace > .tool-form > label { margin-bottom: 0; }
-.tool-workspace .tool-form { align-items: flex-end; gap: 14px 12px; }
-.tool-workspace .tool-form > label:not(.check-label) { display: grid; align-content: start; gap: 8px; color: var(--soft); font: 14px/20px var(--mono); }
-.tool-workspace .tool-form > label > :is(input:not([type=checkbox]), .cyber-select) { margin: 0; }
-.application .tool-workspace input:not([type=checkbox]), .application .tool-workspace .cyber-select-trigger { height: var(--tool-control-height); min-height: var(--tool-control-height); padding: 10px 12px; font: 500 18px/24px 'Rajdhani', sans-serif; }
-.tool-workspace .tool-form .cyber-select { display: flex; }
+.application .file-body .tool-form > label { margin-bottom: 0; }
+.file-body .tool-form { align-items: flex-end; gap: 14px 12px; }
+.file-body .tool-form > label:not(.check-label) { display: grid; align-content: start; gap: 8px; color: var(--soft); font: 16px/22px var(--mono); }
+.file-body .tool-form > label > :is(input:not([type=checkbox]), .cyber-select) { margin: 0; }
+.application .file-body input:not([type=checkbox]), .application .file-body .cyber-select-trigger { height: var(--tool-control-height); min-height: var(--tool-control-height); padding: 10px 12px; font: 500 18px/24px 'Rajdhani', sans-serif; }
+.file-body .tool-form .cyber-select { display: flex; }
 .application .tool-workspace :is(input:not([type=checkbox]), textarea, .cyber-select-trigger) { border-color: color-mix(in srgb, var(--tool-ink) 45%, var(--border)); border-radius: 0; }
 .application .tool-workspace :is(input:not([type=checkbox]), textarea):focus { border-color: var(--tool-ink); box-shadow: 0 0 10px color-mix(in srgb, var(--tool-ink) 14%, transparent); }
 .application .tool-workspace .cyber-select-trigger { border-color: var(--border); }
@@ -155,15 +149,16 @@
 .tool-workspace .cyber-select-trigger > svg { color: var(--tool-ink); }
 .tool-workspace .cyber-select-menu { --cyan: var(--tool-ink); }
 .tool-workspace .tool-form > .check-label { display: flex; align-items: center; min-height: 24px; margin: 0; }
-.tool-workspace input[type=checkbox] { accent-color: var(--tool-ink); }
 .tool-workspace .inline-form { flex-wrap: wrap; }
 .tool-workspace .inline-form > input { flex-basis: 180px; }
 .tool-workspace .form-grid { align-items: end; }
-@media (max-width: 440px) { .application .dm-tools .tool-workspace { padding: 14px 12px; } }
+.tool-workspace .form-grid > label { min-width: 0; margin-bottom: 0; }
+.tool-workspace .record-picker { display: grid; grid-template-columns: minmax(0, 1fr) var(--tool-control-height); align-items: end; margin-block: 24px 18px; }
+.tool-workspace .record-picker > label { min-width: 0; }
+.tool-workspace .record-picker > .icon-button { width: var(--tool-control-height); height: var(--tool-control-height); color: var(--orange); }
 
 .oracle-panel { margin-bottom: 24px; }
 .oracle-body { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(220px, 1fr); gap: 16px 24px; }
-.oracle-modes { grid-column: 1 / -1; width: fit-content; }
 .oracle-body > form { min-width: 0; }
 .oracle-body > form > input { width: 100%; font-size: 18px; }
 .oracle-body .oracle-output { min-width: 0; margin: 0; border-left: 0; border-top: 0; padding: 12px 16px; align-self: stretch; }
@@ -178,9 +173,8 @@
 .oracle-source-picker legend { margin-bottom: 8px; font: 14px var(--mono); color: var(--soft); }
 .oracle-source-picker label { cursor: pointer; display: flex; align-items: center; gap: 6px; padding: 6px 9px; min-height: 36px; border-bottom: 1px solid var(--border); color: var(--soft); font: 600 16px 'Rajdhani', sans-serif; }
 .oracle-source-picker label:has(:checked) { color: var(--pink); border-color: var(--pink); background: color-mix(in srgb, var(--pink) 9%, transparent); }
-.oracle-source-picker input { accent-color: var(--pink); width: 16px; height: 16px; }
 .oracle-sources .helper { margin-top: 10px; font-size: 16px; line-height: 1.5; color: var(--soft); }
 @media (max-width: 900px) { .oracle-body { grid-template-columns: minmax(0, 1fr); } .oracle-body .oracle-output { border-left: 0; border-top: 1px solid var(--border); padding: 14px 0 0; } }
 @media (max-width: 720px) { .application .drive-nav > button { min-height: 115px; padding: 12px 10px; } .application .drive-nav > button .drive-copy strong { font-size: 14px; } .site-header .header-right { flex-wrap: wrap; } }
-@media (max-width: 440px) { .application .drive-nav { gap: 5px; } .application .drive-nav > button { padding-inline: 8px; } .session-combo { flex: 1; } .application .cyber-action { padding-inline: 12px; } }
+@media (max-width: 440px) { .application .drive-nav { gap: 5px; } .application .drive-nav > button { padding-inline: 8px; } .session-combo { flex: 1; } }
 @media (prefers-reduced-motion: reduce) { .application *, .application *:before, .application *:after { animation: none !important; transition: none !important; } }

@@ -6,6 +6,7 @@ import referenceEn from './data/reference-en.json';
 import labelsEn from './data/labels-en.json';
 import english from './data/ui-en.json';
 import { missionKitLabels } from './mission-kit';
+import { coreRuleLabels } from './core-rules';
 
 export type Language = 'es' | 'en';
 // This scope is only for synchronous generator calls and is always restored.
@@ -27,7 +28,7 @@ export function lookup(source: unknown, key: string): unknown {
 export const tableLabel = (key: string, language: Language = generatorLanguage): string => String(lookup(language === 'en' ? labelsEn : labels, key) ?? key);
 export const referenceLabel = (key: string, language: Language = generatorLanguage): string => {
   const cleanKey = key.replace(/^t:/, '');
-  return missionKitLabels[language][cleanKey] ?? String(lookup(language === 'en' ? referenceEn : reference, cleanKey) ?? key);
+  return coreRuleLabels[language][cleanKey] ?? missionKitLabels[language][cleanKey] ?? String(lookup(language === 'en' ? referenceEn : reference, cleanKey) ?? key);
 };
 const tableLookup = {
   t(key: string): unknown {

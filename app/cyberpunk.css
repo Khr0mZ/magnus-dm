@@ -165,8 +165,6 @@
 .favorite-button[aria-pressed=true] { color: var(--accent); filter: drop-shadow(0 0 5px color-mix(in srgb, var(--accent) 45%, transparent)); }
 .search-field input { font-size: 16px; }
 .generated-result { background: linear-gradient(120deg, #001e32ed, #0a0f1cf5); border-color: var(--green); border-left-color: var(--green); box-shadow: 0 0 15px #00ff8b18; }
-.generated-result h3 { font-size: 17px; color: var(--green); text-shadow: 0 0 10px #00ff8b60; }
-.generated-result > p { font-size: 16px; }
 .result-actions { border-color: #00ff8b40; }
 .result-actions button { font-size: 14px; color: var(--green); }
 
@@ -189,8 +187,6 @@
 .custom-rows { font-size: 14px; }
 .custom-table li, .balance-grid span, .ip-list b { font-size: 16px; }
 .custom-table li > small, .ip-list small { font-size: 14px; }
-.encounter-panel > p { font-size: 16px; }
-.encounter-panel select { font-size: 15px; }
 .table-scroll table { font-size: 15px; }
 .table-scroll th { font-family: var(--heading); font-size: 14px; letter-spacing: .04em; }
 
@@ -268,8 +264,6 @@
   .tool-description, .empty-state p { font-size: 15px; }
   .record-details summary strong { font-size: 14px; }
   .record-details summary > span:not(:first-child) { font-size: 14px; }
-  .generated-result > p { font-size: 15px; }
-  .generated-result h3 { font-size: 15px; }
   .table-scroll td { font-size: 14px; }
   .history-entry p { font-size: 14px; }
   .notes-panel textarea { font-size: 16px; min-height: 210px; }

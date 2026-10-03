@@ -1,28 +1,30 @@
 import { emptySession, parseSession, type Session } from './session';
+import { isRecord } from './validation';
+import { createReferenceNote, fitReferenceNote, isReferenceNote, referenceNoteBounds, type NoteViewport, type ReferenceNotes, type ReferenceNote } from './reference-notes';
 
 export const SESSION_LIBRARY_KEY = 'magnus-dm.sessions.v2';
 export const LEGACY_SESSION_KEY = 'magnus-dm.session.v1';
 export type SavedSession = { id: string; data: Session };
 export type Favorites = { generators: string[]; references: string[] };
-export type SessionLibrary = { version: 2; activeId: string; reader: boolean; favorites: Favorites; sessions: SavedSession[] };
+export type SessionLibrary = { version: 2; activeId: string; reader: boolean; favorites: Favorites; referenceNotes: ReferenceNotes; sessions: SavedSession[] };
 type Storage = Pick<globalThis.Storage, 'getItem' | 'setItem'>;
 type Snapshot = { library: SessionLibrary; ready: boolean; error: string; dirty: boolean; blocked: boolean };
 const readError = 'No se han podido leer las sesiones guardadas. Tus datos originales siguen en este navegador.';
 const writeError = 'El navegador no ha podido guardar los cambios. Comprueba el espacio disponible.';
 
 export function createSessionLibrary(session = emptySession()): SessionLibrary {
-  return { version: 2, activeId: 'initial', reader: session.reader, favorites: { generators: [...new Set(session.favorites)], references: [] }, sessions: [{ id: 'initial', data: session }] };
+  return { version: 2, activeId: 'initial', reader: session.reader, favorites: { generators: [...new Set(session.favorites)], references: [] }, referenceNotes: {}, sessions: [{ id: 'initial', data: session }] };
 }
 export function parseSessionLibrary(raw: string): SessionLibrary {
   try {
-    const value = JSON.parse(raw) as SessionLibrary;
+    const value = JSON.parse(raw) as SessionLibrary & { referenceScreens?: unknown };
     if (!value || value.version !== 2 || typeof value.activeId !== 'string' || typeof value.reader !== 'boolean'
       || !Array.isArray(value.sessions) || !value.sessions.length) throw new Error();
     const ids = new Set<string>();
     for (const record of value.sessions) {
       if (!record || typeof record.id !== 'string' || !record.id || ids.has(record.id)) throw new Error();
       ids.add(record.id);
-      parseSession(JSON.stringify(record.data));
+      record.data = parseSession(JSON.stringify(record.data));
     }
     if (!ids.has(value.activeId)) throw new Error();
     if (value.favorites === undefined) {
@@ -30,13 +32,25 @@ export function parseSessionLibrary(raw: string): SessionLibrary {
       // them once, without losing selections made in any existing session.
       value.favorites = { generators: [...new Set(value.sessions.flatMap(record => record.data.favorites))], references: [] };
     } else {
-      if (!value.favorites || typeof value.favorites !== 'object' || Array.isArray(value.favorites)) throw new Error();
+      if (!isRecord(value.favorites)) throw new Error();
       for (const kind of ['generators', 'references'] as const) {
         const entries = value.favorites[kind];
         if (!Array.isArray(entries) || !entries.every(key => typeof key === 'string')) throw new Error();
         value.favorites[kind] = [...new Set(entries)];
       }
     }
+    if (value.referenceNotes === undefined) value.referenceNotes = {};
+    if (!isRecord(value.referenceNotes)) throw new Error();
+    const notes = Object.entries(value.referenceNotes as Record<string, unknown>).map(([key, saved]) => {
+      if (!isRecord(saved) || (saved.expanded !== undefined && typeof saved.expanded !== 'boolean')) throw new Error();
+      const note: Record<string, unknown> = { ...saved, pinned: saved.pinned === undefined ? false : saved.pinned };
+      delete note.expanded;
+      if (!isReferenceNote(note)) throw new Error();
+      return [key, note] as const;
+    });
+    value.referenceNotes = Object.fromEntries(notes.filter(([key]) => value.favorites.references.includes(key)));
+    // Discard the removed configurable screen without changing session data.
+    delete value.referenceScreens;
     return value;
   } catch { throw new Error(readError); }
 }
@@ -131,7 +145,42 @@ export function createSessionStore(getStorage: () => Storage) {
       if (!key) return false;
       return transact(library => {
         const entries = library.favorites[kind];
-        return { ...library, favorites: { ...library.favorites, [kind]: entries.includes(key) ? entries.filter(item => item !== key) : [...entries, key] } };
+        const removing = entries.includes(key);
+        return { ...library, favorites: { ...library.favorites, [kind]: removing ? entries.filter(item => item !== key) : [...entries, key] },
+          referenceNotes: kind === 'references' && removing ? Object.fromEntries(Object.entries(library.referenceNotes).filter(([id]) => id !== key)) : library.referenceNotes };
+      });
+    },
+    toggleReferenceNote(key: string, viewport?: NoteViewport) {
+      if (!key) return false;
+      return transact(library => {
+        if (!library.favorites.references.includes(key)) return library;
+        const current = library.referenceNotes[key];
+        let note = current ? { ...current, open: !current.open } : createReferenceNote(Object.values(library.referenceNotes).filter(note => note.open).length);
+        if (note.open && viewport && !note.pinned) {
+          if (!current) note = { ...note, y: note.y + viewport.scrollY };
+          const position = fitReferenceNote(note, referenceNoteBounds(viewport, note.pinned));
+          note = { ...note, x: position.x, y: position.y };
+        }
+        const order = Math.max(0, ...Object.values(library.referenceNotes).map(note => note.order)) + 1;
+        return { ...library, referenceNotes: { ...library.referenceNotes, [key]: { ...note, order } } };
+      });
+    },
+    updateReferenceNote(key: string, change: Partial<Omit<ReferenceNote, 'order'>>) {
+      return transact(library => {
+        const current = library.referenceNotes[key];
+        if (!current || !library.favorites.references.includes(key)) return library;
+        const note = { ...current, ...change };
+        if (!isReferenceNote(note)) throw new Error('No se ha podido guardar la posición de la referencia.');
+        return { ...library, referenceNotes: { ...library.referenceNotes, [key]: note } };
+      });
+    },
+    raiseReferenceNote(key: string) {
+      return transact(library => {
+        const current = library.referenceNotes[key];
+        if (!current?.open) return library;
+        const order = Math.max(0, ...Object.values(library.referenceNotes).filter(note => note.open).map(note => note.order));
+        if (current.order === order) return library;
+        return { ...library, referenceNotes: { ...library.referenceNotes, [key]: { ...current, order: order + 1 } } };
       });
     },
     selectSession(id: string) {

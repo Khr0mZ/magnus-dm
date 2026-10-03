@@ -1,20 +1,13 @@
-import type { GMTableCategory, GMTableDef } from './reference';
+import type { GMTableCategory } from './reference';
+import { createRuleCatalog, bilingual as b, type RuleFile } from './rule-catalog';
 
 // Summaries checked against the user-provided CEMK Rule Book.
 // Page references use the book's printed numbering, not the PDF viewer's index.
 // Type-only imports keep this catalog independent from reference/i18n at runtime.
-type Bilingual = { es: string; en: string };
-type Cell = Bilingual | string | number;
-type RuleFile = {
-  key: string; title: Bilingual; description: Bilingual; pages: string; sheet?: string;
-  headers?: Bilingual[]; rows: Cell[][];
-};
-const b = (es: string, en: string): Bilingual => ({ es, en });
-const ruleHeaders = [b('Regla', 'Rule'), b('Resolución', 'Resolution')];
 const hackHeaders = [b('Quickhack', 'Quickhack'), b('DV', 'DV'), b('Efecto y límites', 'Effect and limits')];
 const hackDescription = b(
-  'Mission Kit: 1 acción NET y un único intento por objetivo y turno, incluso si falla. Primero supera todos sus Passwalls. Tira Interfaz + 1d10 y supera la DV. En RED, aplica también los requisitos de rango de la carpeta RED + CEMK.',
-  'Mission Kit: 1 NET Action and only one attempt per target per turn, even on failure. Breach all its Passwalls first. Roll Interface + 1d10 and beat the DV. In RED, also apply the rank requirements in the RED + CEMK folder.',
+  'Mission Kit: 1 acción NET y un intento de cada quickhack por objetivo y turno, incluso si falla. Puedes probar otro quickhack contra ese objetivo en el mismo turno. Primero supera todos sus Passwalls. Interfaz + 1d10 debe superar DV. En RED, aplica los requisitos de rango de RED + CEMK.',
+  'Mission Kit: 1 NET Action and one attempt of each Quickhack per target per turn, even on failure. You may try a different Quickhack against that target in the same turn. Breach all Passwalls first. Interface + 1d10 must beat DV. In RED, apply RED + CEMK rank requirements.',
 );
 const monthlyDescription = b(
   'RED + CEMK: evalúa al principio de cada mes. Los efectos son acumulativos: tira por cada condición aplicable. Las ganancias nunca superan la Humanidad máxima.',
@@ -30,7 +23,7 @@ const netrunning: RuleFile[] = [
       [b('Economía del turno', 'Turn economy'), b('Movimiento normal + 1 acción física O hasta 3 acciones NET en el Mission Kit. No combines acciones físicas y NET en el mismo turno.', 'Normal Move Action + either 1 Meat Action OR up to 3 NET Actions in the Mission Kit. Do not combine Meat and NET Actions in one turn.')],
       [b('Tirada de Interfaz', 'Interface Check'), b('Rango de Interfaz + 1d10; no sumas ningún STAT. Se aplican las reglas normales de críticos, Suerte, habilidad complementaria y tiempo extra; también penalizadores por heridas o agarres.', 'Interface rank + 1d10; add no STAT. Normal critical, LUCK, Complementary Skill and Taking Extra Time rules apply, as do wound and grappling penalties.')],
       [b('Secuencia', 'Sequence'), b('Jack In → Breach de cada Passwall → Quickhack. Jack Out permite salir de forma segura. Cada paso consume 1 acción NET.', 'Jack In → Breach each Passwall → Quickhack. Jack Out disconnects safely. Each step costs 1 NET Action.')],
-      [b('Límite de intentos', 'Attempt limit'), b('Solo 1 intento de quickhack por objetivo y turno, aunque falle. Con acciones NET restantes puedes actuar contra otros objetivos.', 'Only 1 Quickhack attempt per target per turn, even if it fails. Remaining NET Actions can target other people.')],
+      [b('Límite de intentos', 'Attempt limit'), b('Cada quickhack concreto solo puede intentarse una vez contra cada objetivo por turno. Puedes gastar acciones NET restantes en otro quickhack contra el mismo objetivo o en otros objetivos.', 'Each specific Quickhack may be attempted only once per target per turn. Remaining NET Actions may try another Quickhack against the same target or act against other targets.')],
       [b('Alerta', 'Awareness'), b('Un quickhack exitoso alerta inmediatamente al objetivo, salvo Lure.', 'A successful Quickhack immediately alerts the target, except Lure.')],
       [b('Quickhacks disponibles', 'Available Quickhacks'), b('En las reglas rápidas, todos los netrunners pueden usar los 11 quickhacks. La progresión por rango pertenece a la adaptación RED.', 'In the quickstart rules, every Netrunner can use all 11 Quickhacks. Rank progression belongs to the RED adaptation.')],
       [b('Daño crítico', 'Critical damage'), b('Los dados de daño de quickhacks no provocan lesiones críticas al sacar dos 6. Sonic Shock sí impone expresamente el efecto de oído dañado.', 'Quickhack damage dice do not trigger Critical Injuries by rolling two 6s. Sonic Shock explicitly imposes the Damaged Ear effect.')],
@@ -283,29 +276,8 @@ const otherRules: RuleFile[] = [
   },
 ];
 
-export const missionKitLabels: Record<'es' | 'en', Record<string, string>> = { es: {}, en: {} };
-function label(key: string, value: Bilingual): string {
-  const fullKey = `cemk.${key}`;
-  missionKitLabels.es[fullKey] = value.es;
-  missionKitLabels.en[fullKey] = value.en;
-  return fullKey;
-}
-function category(key: string, title: Bilingual, color: string, files: RuleFile[]): GMTableCategory {
-  return {
-    key, titleKey: label(key, title), color,
-    tables: files.map((file): GMTableDef => ({
-      key: file.key, color,
-      titleKey: label(`${file.key}.title`, file.title),
-      descriptionKey: label(`${file.key}.description`, file.description),
-      sourceKey: label(`${file.key}.source`, b(
-        `Fuente: Cyberpunk: Edgerunners Mission Kit · Rule Book · pp. ${file.pages} (paginación impresa)${file.sheet ? ` · ${file.sheet}` : ''}. Resumen de consulta; traducción propia.`,
-        `Source: Cyberpunk: Edgerunners Mission Kit · Rule Book · pp. ${file.pages} (printed pages)${file.sheet ? ` · ${file.sheet}` : ''}. Rules reference summary.`,
-      )),
-      columns: (file.headers ?? ruleHeaders).map((header, i) => ({ headerKey: label(`${file.key}.header.${i}`, header) })),
-      rows: file.rows.map((cells, r) => ({ cells: cells.map((cell, c) => typeof cell === 'object' ? `t:${label(`${file.key}.row.${r}.${c}`, cell)}` : cell) })),
-    })),
-  };
-}
+const { labels: missionKitLabels, category } = createRuleCatalog('cemk', 'Cyberpunk: Edgerunners Mission Kit · Rule Book');
+export { missionKitLabels };
 export const missionKitCategories: GMTableCategory[] = [
   category('cemkNetrunning', b('Edgerunners · quickhacks', 'Edgerunners · Quickhacks'), '#EDFF3A', netrunning),
   category('cemkRedNetrunning', b('Netrunning · RED + CEMK', 'Netrunning · RED + CEMK'), '#76FFAF', redNetrunning),
